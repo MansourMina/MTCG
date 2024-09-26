@@ -1,4 +1,4 @@
-﻿namespace MTCG
+﻿namespace MTCG.Presentation
 {
     internal class Program
     {
