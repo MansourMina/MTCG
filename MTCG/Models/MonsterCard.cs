@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MTCG
+namespace MTCG.Models
 {
-    public class MonsterCard: Card
+    public class MonsterCard : Card
     {
         public MonsterCard(string name, int damage, string elementType) : base(name, damage, elementType)
         {
