@@ -6,23 +6,26 @@ using System.Threading.Tasks;
 
 namespace MTCG.Models
 {
-    public enum ELEMENTTYPE
+    public enum ElementType
     {
         Fire,
         Water,
         Normal
     }
+
+    public enum CardType
+    {
+        SpellCard, 
+        MonsterCard
+    }
     public abstract class Card
     {
-        public string Name { get; set; }
-        public int Damage
-        {
-            get;
-        }
+        public string Name { get; protected set; }
+        public int Damage { get; }
         
-        public ELEMENTTYPE ElementType { get; }
+        public ElementType ElementType { get; }
 
-        public Card(string name, int damage, ELEMENTTYPE elementType)
+        public Card(string name, int damage, ElementType elementType)
         {
             Name = name;
             Damage = damage;
