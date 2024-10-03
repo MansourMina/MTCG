@@ -23,7 +23,7 @@ namespace MTCG.Services
         {
             isEffective,
             notEffective,
-            noEffective
+            noEffect
         }
         public Battle(User leftPlayer, User rightPlayer)
         {
@@ -36,8 +36,8 @@ namespace MTCG.Services
             Random rnd = new Random();
             while(CurrentRound <= MaxRounds)
             {
-                Card leftPlayerCard = LeftPlayer.deck.Cards[rnd.Next(4)];
-                Card rightPlayerCard = RightPlayer.deck.Cards[rnd.Next(4)];
+                Card leftPlayerCard = LeftPlayer.deck.Cards[rnd.Next(LeftPlayer.deck.Cards.Count)];
+                Card rightPlayerCard = RightPlayer.deck.Cards[rnd.Next(RightPlayer.deck.Cards.Count)];
 
                 int leftPlayerDamage = leftPlayerCard.Damage;
                 int rightPlayerDamage = rightPlayerCard.Damage;
@@ -85,7 +85,7 @@ namespace MTCG.Services
         {
             ElementType leftE = leftPlayerCard.ElementType;
             ElementType rightE = rightPlayerCard.ElementType;
-            Effectiveness effectiveness = Effectiveness.noEffective;
+            Effectiveness effectiveness = Effectiveness.noEffect;
 
             // Not Effective
             if (leftE == ElementType.Fire && rightE == ElementType.Water || 
@@ -106,17 +106,17 @@ namespace MTCG.Services
         {
             if (leftPlayerCard.Damage > rightPlayerCard.Damage)
             {
-                LeftPlayer.addWin();
-                RightPlayer.addLosses();
-                RightPlayer.deck.RemoveCard(rightPlayerCard);
-                LeftPlayer.deck.AddCard(rightPlayerCard);
+                LeftPlayer.addWin(WinningPoints);
+                RightPlayer.addLosses(LosingPoints);
+                //LeftPlayer.deck.AddCard(rightPlayerCard);
+                //RightPlayer.deck.RemoveCard(rightPlayerCard);
             }
             else if (leftPlayerCard.Damage < rightPlayerCard.Damage)
             {
-                LeftPlayer.addLosses();
-                RightPlayer.addWin();
-                LeftPlayer.deck.RemoveCard(leftPlayerCard);
-                RightPlayer.deck.AddCard(leftPlayerCard);
+                LeftPlayer.addLosses(WinningPoints);
+                RightPlayer.addWin(LosingPoints);
+                //RightPlayer.deck.AddCard(leftPlayerCard);
+                //LeftPlayer.deck.RemoveCard(leftPlayerCard);
             }
             else
             {

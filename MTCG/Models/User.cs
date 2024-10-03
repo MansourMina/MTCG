@@ -1,5 +1,4 @@
-﻿using MTCG.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace MTCG.Models
 {
-
     public class User
     {
         public string Name { get; private set; }
@@ -44,21 +42,15 @@ namespace MTCG.Models
                 deck.AddCard(cards[card]);
         }
 
-        public void printDeck()
+        public void addWin(int points)
         {
-            for(int card = 0; card < deck.Cards.Count; card++)
-                Console.WriteLine(deck.Cards[card].Name);
-        }
-
-        public void addWin()
-        {
-            Elo += Battle.WinningPoints;
+            Elo += points;
             statistic.addWin();
         }
 
-        public void addLosses()
+        public void addLosses(int points)
         {
-            Elo -= Battle.LosingPoints - Elo < 0 ? 0:Battle.LosingPoints;
+            Elo -= Elo - points <= 0 ? 0:points;
             statistic.addLosses();
         }
 

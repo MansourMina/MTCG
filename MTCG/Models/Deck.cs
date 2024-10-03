@@ -18,8 +18,19 @@ namespace MTCG.Models
 
         public void AddCard(Card card)
         {
-            if (Cards.Count >= Cards.Capacity) return;
-            Cards.Add(card);
+            if (Cards.Count < Cards.Capacity)
+            {
+                Cards.Add(card);
+                return;
+            }
+            for (int i = 0; i < Cards.Count; i++)
+            {
+                if (card.Damage > Cards[i].Damage)
+                {
+                    Cards[i] = card;
+                    return;
+                }
+            }
         }
 
         public void RemoveCard(Card card)
