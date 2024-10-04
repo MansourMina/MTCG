@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MTCG.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,14 +10,12 @@ namespace MTCG.Models
     public class Deck
     {
         public List<Card> Cards { get; private set; }
-        private const int DefaultSize = 4;
-
-        public Deck(int deck_size = DefaultSize)
+        public Deck(int deck_size = Battle.DeckSize)
         {
             Cards = new List<Card>(deck_size);
         }
 
-        public void AddCard(Card card)
+        public void addCard(Card card)
         {
             if (Cards.Count < Cards.Capacity)
             {
@@ -33,7 +32,13 @@ namespace MTCG.Models
             }
         }
 
-        public void RemoveCard(Card card)
+        public void Set(List<Card> cards)
+        {
+            int deckSpace = Cards.Capacity - Cards.Count;
+            for (int card = 0; card < deckSpace && card < cards.Count; card++)
+                addCard(cards[card]);
+        }
+        public void removeCard(Card card)
         {
             Cards.Remove(card);
         }

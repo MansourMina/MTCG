@@ -14,16 +14,25 @@ namespace MTCG.Services
         public User RightPlayer { get; private set; }
         public int CurrentRound { get; private set; } = 1;
 
-        private const int MaxRounds = 100;
+        private const int MaxRounds = 500;
 
         public const int WinningPoints = 3;
 
         public const int LosingPoints = 3;
+
+        public const int DeckSize = 4;
         enum Effectiveness
         {
             isEffective,
             notEffective,
             noEffect
+        }
+
+        public enum GameStatus
+        {
+            LeftPlayerLost,
+            RightPlayerLost,
+            Playing
         }
         public Battle(User leftPlayer, User rightPlayer)
         {
@@ -34,10 +43,14 @@ namespace MTCG.Services
         public void start()
         {
             Random rnd = new Random();
-            while(CurrentRound <= MaxRounds)
+            GameStatus gameStatus = GameStatus.Playing;
+            while (CurrentRound <= MaxRounds && gameStatus == GameStatus.Playing)
             {
-                Card leftPlayerCard = LeftPlayer.deck.Cards[rnd.Next(LeftPlayer.deck.Cards.Count)];
-                Card rightPlayerCard = RightPlayer.deck.Cards[rnd.Next(RightPlayer.deck.Cards.Count)];
+                var leftPlayerCards = LeftPlayer.Deck.Cards;
+                var rightPlayerCards = RightPlayer.Deck.Cards;
+
+                Card leftPlayerCard = leftPlayerCards[rnd.Next(leftPlayerCards.Count)];
+                Card rightPlayerCard = rightPlayerCards[rnd.Next(rightPlayerCards.Count)];
 
                 int leftPlayerDamage = leftPlayerCard.Damage;
                 int rightPlayerDamage = rightPlayerCard.Damage;
@@ -47,11 +60,24 @@ namespace MTCG.Services
                     leftPlayerDamage = reCalcDamage(leftPlayerCard, rightPlayerCard);
                     rightPlayerDamage = reCalcDamage(rightPlayerCard, leftPlayerCard);
                 }
-
-                updateGame(leftPlayerCard, rightPlayerCard);
                 printStatistics(CurrentRound);
+                updateGame(leftPlayerDamage, leftPlayerCard, rightPlayerDamage, rightPlayerCard);
+                gameStatus = checkGameOver();
                 CurrentRound++;
             }
+
+            if(gameStatus == GameStatus.LeftPlayerLost)
+                Console.WriteLine($"Left Player Lost - he has {LeftPlayer.cardsCount()} Cards left");
+            if (gameStatus == GameStatus.RightPlayerLost)
+                Console.WriteLine($"Right Player Lost - he has {RightPlayer.cardsCount()} Cards left");
+            else
+            {
+                Console.WriteLine($"{(RightPlayer.statistic.Wins > LeftPlayer.statistic.Wins ? "Right" : "Left")} WON");
+                Console.WriteLine(LeftPlayer.Stack.Cards.Count);
+                Console.WriteLine(RightPlayer.Stack.Cards.Count);
+            }
+
+
         }
 
         private void printStatistics(int round)
@@ -78,6 +104,7 @@ namespace MTCG.Services
                 case Effectiveness.notEffective:
                     damage /= 2;
                     break;
+                default: break;
             }
             return damage;
         }
@@ -102,27 +129,42 @@ namespace MTCG.Services
         }
 
 
-        private void updateGame(Card leftPlayerCard, Card rightPlayerCard)
+        private void updateGame(int leftPlayerDamage, Card leftPlayerCard, int rightPlayerDamage, Card rightPlayerCard)
         {
-            if (leftPlayerCard.Damage > rightPlayerCard.Damage)
+            if (leftPlayerDamage > rightPlayerDamage)
             {
                 LeftPlayer.addWin(WinningPoints);
                 RightPlayer.addLosses(LosingPoints);
-                //LeftPlayer.deck.AddCard(rightPlayerCard);
-                //RightPlayer.deck.RemoveCard(rightPlayerCard);
+                LeftPlayer.Deck.addCard(rightPlayerCard);
+                removeCardFromPlayer(RightPlayer, rightPlayerCard);
             }
-            else if (leftPlayerCard.Damage < rightPlayerCard.Damage)
+            else if (rightPlayerDamage < leftPlayerDamage)
             {
-                LeftPlayer.addLosses(WinningPoints);
-                RightPlayer.addWin(LosingPoints);
-                //RightPlayer.deck.AddCard(leftPlayerCard);
-                //LeftPlayer.deck.RemoveCard(leftPlayerCard);
+                LeftPlayer.addLosses(LosingPoints);
+                RightPlayer.addWin(WinningPoints);
+                RightPlayer.Deck.addCard(leftPlayerCard);
+                removeCardFromPlayer(LeftPlayer, leftPlayerCard);
             }
             else
             {
                 LeftPlayer.addDraw();
                 RightPlayer.addDraw();
             }
+        }
+
+        private void removeCardFromPlayer(User player, Card card)
+        {
+            player.Deck.removeCard(card);
+            Card? randomCard = player.Stack.popRandomCard();
+            if (randomCard != null)
+                player.Deck.addCard(randomCard);
+        }
+
+        public GameStatus checkGameOver()
+        {
+            if (LeftPlayer.noCardsLeft()) return GameStatus.LeftPlayerLost;
+            if (RightPlayer.noCardsLeft()) return GameStatus.RightPlayerLost;
+            return GameStatus.Playing;
         }
     }
 }

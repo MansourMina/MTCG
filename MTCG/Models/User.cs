@@ -13,7 +13,7 @@ namespace MTCG.Models
         public string Password { get; private set; }
         public int Coins { get; private set; } = 20;
         public Stack Stack { get; private set; } = new Stack();
-        public Deck deck { get; private set; } = new Deck();
+        public Deck Deck { get; private set; } = new Deck();
         public int Elo { get; private set; } = 100;
         public Statistic statistic { get; private set; } = new Statistic();
 
@@ -35,12 +35,7 @@ namespace MTCG.Models
             Password= password;
         }
 
-        public void setDeck(List<Card> cards)
-        {
-            int deckSpace= deck.Cards.Capacity - deck.Cards.Count;
-            for (int card = 0; card < deckSpace && card < cards.Count; card++)
-                deck.AddCard(cards[card]);
-        }
+        
 
         public void addWin(int points)
         {
@@ -59,6 +54,14 @@ namespace MTCG.Models
             statistic.addDraw();
         }
 
+        public bool noCardsLeft()
+        {
+            return cardsCount() == 0;
+        }
 
+        public int cardsCount()
+        {
+            return Stack.Cards.Count + Deck.Cards.Count;
+        }
     }
 }
