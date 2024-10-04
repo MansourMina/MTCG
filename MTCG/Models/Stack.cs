@@ -34,9 +34,18 @@ namespace MTCG.Models
 
         public Card? popRandomCard()
         {
+            //if (Cards.Count == 0) return null;
+            //Card? highestCard = null;
+            //foreach (Card card in Cards)
+            //{
+            //    if (highestCard == null || card.Damage > highestCard.Damage)
+            //        highestCard = card;
+            //}
+            //removeCard(highestCard);
+            //return highestCard;
+
             Random rnd = new Random();
             return Cards[rnd.Next(Cards.Count)];
-            
         }
 
     }
