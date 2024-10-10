@@ -10,7 +10,7 @@
   <Class Name="MTCG.Models.Deck">
     <Position X="11" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAIAAAAAAAAAQAAAAAAAAIAAAAAAAACAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAIAAAAAAQAAAAAAAAAACA=</HashCode>
       <FileName>Models\Deck.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -24,14 +24,14 @@
   <Class Name="MTCG.Models.Stack">
     <Position X="7.25" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAQAAAAAAAAAACA=</HashCode>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAIAAAAAAQAAAAAAAgAACA=</HashCode>
       <FileName>Models\Stack.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.User">
     <Position X="9" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAAAAAECAQEpAAAAEACAIAIAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAIAoAAAAAAAECAQEoAAAAAACAIBIAAAAAAA=</HashCode>
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -43,9 +43,14 @@
           <NewMemberFileName>Services\Battle.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
+      <Enum Name="MTCG.Services.Battle.GameStatus" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Services\Battle.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAgICAAAAAAAwAAAICAAAAEAAAQAAAEAAACAAAAA=</HashCode>
+      <HashCode>EAAAAgICAAAAAAAwAAAICAAAAEAAAUAAAEAAACAAAEA=</HashCode>
       <FileName>Services\Battle.cs</FileName>
     </TypeIdentifier>
   </Class>

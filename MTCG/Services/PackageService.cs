@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace MTCG.Services
 {
-    public class Login
+    public class PackageService
     {
-
     }
 }

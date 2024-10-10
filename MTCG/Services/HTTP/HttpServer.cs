@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MTCG.HTTP
+namespace MTCG.Services.HTTP
 {
     public class HttpServer
     {

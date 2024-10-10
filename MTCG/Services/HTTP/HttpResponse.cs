@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MTCG
+namespace MTCG.Services.HTTP
 {
     public class HttpResponse
     {
@@ -14,16 +14,20 @@ namespace MTCG
 
         public StreamWriter Writer { get; set; }
 
-        public HttpResponse(StreamWriter writer) {
-            Writer= writer;
+        public HttpResponse(StreamWriter writer)
+        {
+            Writer = writer;
         }
 
         public void Send()
         {
+            // Header
             Writer.WriteLine($"HTTP/1.0 {Status}");
             Writer.WriteLine($"Content-Type: {ContentType}");
             Writer.WriteLine($"Content-Length: {Body.Length}");
             Writer.WriteLine(); // empty line indicates end of headers
+
+            // Body
             Writer.WriteLine(Body);
         }
     }

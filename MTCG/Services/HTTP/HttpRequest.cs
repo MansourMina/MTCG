@@ -5,17 +5,18 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MTCG
+namespace MTCG.Services.HTTP
 {
     public class HttpRequest
-    {   
+    {
         public string Method { get; private set; }
         public string Path { get; private set; }
         public string Version { get; private set; }
         public int Content_Length { get; private set; } = 0;
         public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
         public StringBuilder Body { get; private set; } = new StringBuilder();
-        public HttpRequest(StreamReader reader) {
+        public HttpRequest(StreamReader reader)
+        {
             readHttp(reader);
             readHeader(reader);
             readBody(reader);
@@ -62,11 +63,8 @@ namespace MTCG
                     var bytesRead = reader.Read(chars, 0, chars.Length);
                     bytesReadTotal += bytesRead;
                     if (bytesRead == 0)
-                    {
                         break;  // no more data available
-                    }
                     Body.Append(chars, 0, bytesRead);
-
                 }
             }
         }

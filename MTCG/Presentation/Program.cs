@@ -1,7 +1,8 @@
-﻿using MTCG.HTTP;
-using MTCG.Models;
+﻿using MTCG.Models;
 using MTCG.Services;
+using MTCG.Services.HTTP;
 using System.Net;
+using MTCG.Database;
 
 namespace MTCG.Presentation
 {
@@ -90,6 +91,7 @@ namespace MTCG.Presentation
 
             HttpServer server = new HttpServer(IPAddress.Any, 8000);
             server.Start();
+
 
         }
     }

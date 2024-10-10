@@ -3,10 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MTCG.Models
 {
+    public class DeserializeUser
+    {
+        public string? Username;
+        public string? Password;
+        public string? token;
+    }
     public class User
     {
         public string Name { get; private set; }
@@ -17,25 +24,22 @@ namespace MTCG.Models
         public int Elo { get; private set; } = 100;
         public Statistic statistic { get; private set; } = new Statistic();
 
-        
         public User(string name, string password)
         {
             _setCredentials(name, password);
         }
+
         public User(string name, string password, Stack stack)
         {
             _setCredentials(name, password);
             Stack = stack;
         }
 
-        
         private void _setCredentials(string name, string password)
         {
             Name = name;
-            Password= password;
+            Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
         }
-
-        
 
         public void addWin(int points)
         {
