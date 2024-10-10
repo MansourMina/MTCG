@@ -1,4 +1,5 @@
-﻿using MTCG.Models;
+﻿using MTCG.HTTP;
+using MTCG.Models;
 using MTCG.Services;
 using System.Net;
 
@@ -87,7 +88,7 @@ namespace MTCG.Presentation
             //       Battle battle = new Battle(leftPlayer, rightPlayer); 
             //       battle.start();
 
-            Server server = new Server(IPAddress.Any, 8000);
+            HttpServer server = new HttpServer(IPAddress.Any, 8000);
             server.Start();
 
         }

@@ -7,24 +7,24 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MTCG
+namespace MTCG.HTTP
 {
-    public class Server
+    public class HttpServer
     {
-        private TcpListener _listener;
+        private TcpListener _server;
         public IPAddress IpAddress { get; }
         public int Port { get; }
 
-        public Server(IPAddress ipAddress, int port)
+        public HttpServer(IPAddress ipAddress, int port)
         {
             IpAddress = ipAddress;
             Port = port;
-            _listener = new TcpListener(IpAddress, Port);
+            _server = new TcpListener(IpAddress, Port);
         }
 
         public void Start()
         {
-            _listener.Start();
+            _server.Start();
             Console.WriteLine($"Server {IpAddress} waiting for connections...");
             IncomingConnections();
         }
@@ -33,7 +33,7 @@ namespace MTCG
         {
             while (true)
             {
-                var client = _listener.AcceptTcpClient();
+                var client = _server.AcceptTcpClient();
                 using var reader = new StreamReader(client.GetStream());
                 using var writer = new StreamWriter(client.GetStream()) { AutoFlush = true };
                 HandleConnection(client, reader, writer);
