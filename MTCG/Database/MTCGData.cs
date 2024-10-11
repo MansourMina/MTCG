@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MTCG.Database
 {
-    public static class MCTGData
+    public static class MTCGData
     {
-        public static List<User> Users { get; } = new List<User>
+        public static List<User> Users { get; private set; } = new List<User>
         {
             new User("Mina", "Mina$2024"),
             new User("JohnDoe", "JohnDoe!789"),
@@ -37,8 +37,7 @@ namespace MTCG.Database
         {
             foreach(var user in Users)
             {
-                Console.WriteLine(user.Name);
-                if (user.Name == name) return user;
+                if (user.Username == name) return user;
             }
             return null;
         }
@@ -48,6 +47,16 @@ namespace MTCG.Database
             var user = getUser(username);
             bool isPasswordValid = BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password);
             Console.WriteLine(isPasswordValid);
+        }
+
+        public static void addUser(string username, string password)
+        {
+            Users.Add(new User(username, password));
+        }
+
+        public static void addUser(User user)
+        {
+            Users.Add(user);
         }
     }
 }

@@ -16,12 +16,13 @@ namespace MTCG.Models
     }
     public class User
     {
-        public string Name { get; private set; }
+        public string Username { get; private set; }
         public string Password { get; private set; }
         public int Coins { get; private set; } = 20;
         public Stack Stack { get; private set; } = new Stack();
         public Deck Deck { get; private set; } = new Deck();
         public int Elo { get; private set; } = 100;
+        public string Token { get;  private set; }
         public Statistic statistic { get; private set; } = new Statistic();
 
         public User(string name, string password)
@@ -37,7 +38,7 @@ namespace MTCG.Models
 
         private void _setCredentials(string name, string password)
         {
-            Name = name;
+            Username = name;
             Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
         }
 
@@ -66,6 +67,11 @@ namespace MTCG.Models
         public int cardsCount()
         {
             return Stack.Cards.Count + Deck.Cards.Count;
+        }
+
+        public void setToken(string token)
+        {
+            if (Guid.TryParse(token, out Guid parsedGuid)) Token = token;
         }
     }
 }

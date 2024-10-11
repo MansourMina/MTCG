@@ -17,10 +17,9 @@ namespace MTCG.Services
         }
         public string Login(string name, string password)
         {
-            var user = MCTGData.getUser(name);
+            var user = MTCGData.getUser(name);
             string? existingUserToken = isLoggedIn(user);
             if(existingUserToken != null) return existingUserToken;
-            Console.WriteLine(user.Password);
             if (user != null && BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
             {
                 string token = Guid.NewGuid().ToString();
