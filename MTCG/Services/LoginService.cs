@@ -21,12 +21,15 @@ namespace MTCG.Services
             string? existingUserToken = isLoggedIn(user);
             if(existingUserToken != null) return existingUserToken;
             if (user != null && BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
-            {
-                string token = Guid.NewGuid().ToString();
-                _tokens[token] = user;
-                return token;
-            }
+                return CreateToken(user);
             throw new UnauthorizedAccessException("Invalid username or password");
+        }
+
+        public string CreateToken(User user)
+        {
+            string token = Guid.NewGuid().ToString();
+            _tokens[token] = user;
+            return token;
         }
         public bool VerifyToken(string token)
         {

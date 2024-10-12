@@ -48,12 +48,6 @@ namespace MTCG.Database
             bool isPasswordValid = BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password);
             Console.WriteLine(isPasswordValid);
         }
-
-        public static void addUser(string username, string password)
-        {
-            Users.Add(new User(username, password));
-        }
-
         public static void addUser(User user)
         {
             Users.Add(user);

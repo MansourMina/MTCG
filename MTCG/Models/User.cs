@@ -16,7 +16,9 @@ namespace MTCG.Models
     }
     public class User
     {
+        [JsonInclude]
         public string Username { get; private set; }
+        [JsonInclude]
         public string Password { get; private set; }
         public int Coins { get; private set; } = 20;
         public Stack Stack { get; private set; } = new Stack();
@@ -25,6 +27,8 @@ namespace MTCG.Models
         public string Token { get;  private set; }
         public Statistic statistic { get; private set; } = new Statistic();
 
+        [JsonConstructor]
+        private User() { }
         public User(string name, string password)
         {
             _setCredentials(name, password);
@@ -39,7 +43,7 @@ namespace MTCG.Models
         private void _setCredentials(string name, string password)
         {
             Username = name;
-            Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password);
+            Password = password;
         }
 
         public void addWin(int points)

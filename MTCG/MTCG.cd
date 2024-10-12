@@ -31,7 +31,7 @@
   <Class Name="MTCG.Models.User">
     <Position X="9" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAoAAAAAAAECAQEoAAAAAACAIBIAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAQAIAoAAAAAQAECAAEoAAAAAACAIBIAAABAAA=</HashCode>
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>

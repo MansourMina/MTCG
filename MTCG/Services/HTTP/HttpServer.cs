@@ -13,9 +13,9 @@ namespace MTCG.Services.HTTP
     {
         private TcpListener _server;
         public IPAddress IpAddress { get; }
-        public int Port { get; }
+        public static int Port { get; private set; }
 
-        public HttpServer(IPAddress ipAddress, int port)
+        public HttpServer(IPAddress ipAddress, int port = 8000)
         {
             IpAddress = ipAddress;
             Port = port;

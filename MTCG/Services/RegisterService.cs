@@ -17,8 +17,10 @@ namespace MTCG.Services
             if(user != null) throw new InvalidOperationException("User already exists");
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(password)) 
                 throw new ArgumentException("Username or password cannot be empty.");
-            MTCGData.addUser(name, password);
-            return _loginService.Login(name, password);
+
+            var newUser = new User(name, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
+            MTCGData.addUser(newUser);
+            return _loginService.CreateToken(newUser);
         }
 
     }

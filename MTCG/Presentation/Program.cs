@@ -91,8 +91,6 @@ namespace MTCG.Presentation
 
             HttpServer server = new HttpServer(IPAddress.Any, 8000);
             server.Start();
-
-
         }
     }
 }

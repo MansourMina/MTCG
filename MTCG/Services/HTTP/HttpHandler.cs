@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using MTCG.Models;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using static MTCG.Services.HTTP.HttpHandler;
 namespace MTCG.Services.HTTP
 {
     public class HttpHandler
@@ -21,90 +15,87 @@ namespace MTCG.Services.HTTP
             Created = 201,
             NoContent = 204,
             BadRequest = 400,
-            Unauthorized= 401,
-            Conflict= 409
+            Unauthorized = 401,
+            Conflict = 409
         }
-
         public struct ResponseFormat
         {
             public int Status;
             public string Body;
         }
+        public Dictionary<Tuple<string, string>, Func<HttpRequest, ResponseFormat>> Routes = new();
 
-        public Dictionary<Tuple<string, string>, Action<HttpRequest, HttpResponse>> Requests = new();
-        //public Dictionary<string, string> Responses = new();
         public HttpHandler(HttpRequest request, HttpResponse response)
         {
             initializeRequests();
-            //initializeResponses();
             Handle(request, response);
         }
 
-        //private void initializeResponses()
-        //{
-        //    Responses["404"] = "Page Not Found";
-        //    Responses["200"] = "OK";
-        //}
         private void initializeRequests()
-        { 
-            //Requests[Tuple.Create("/users", "GET")] = GetUsers;
-            Requests[Tuple.Create("/sessions", "POST")] = CreateSession;
-            Requests[Tuple.Create("/users", "POST")] = RegisterUser;
+        {
+            Routes[Tuple.Create("/", "GET")] = (request) =>
+                new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = "Whats Poppin -Server" };
+
+            Routes[Tuple.Create("/sessions", "POST")] = CreateSession;
+            Routes[Tuple.Create("/users", "POST")] = RegisterUser;
         }
+
         private void Handle(HttpRequest request, HttpResponse response)
         {
             Console.WriteLine("-------------------------------------------");
             var clientRequest = Tuple.Create(request.Path, request.Method);
             Console.WriteLine(request.Method + " " + request.Path);
 
-            if (Requests.ContainsKey(clientRequest))
+            var finalResponse = new ResponseFormat { Status = (int)HTTPStatusCode.NotFound, Body = "Not found" };
+
+            if (Routes.ContainsKey(clientRequest))
             {
                 try
                 {
-                    Requests[clientRequest](request, response);
+                    var responseFormat = Routes[clientRequest](request);
+                    finalResponse.Status = responseFormat.Status;
+                    finalResponse.Body = responseFormat.Body;
                 }
                 catch (InvalidOperationException e)
                 {
-                    SetResponse(response, (int)HTTPStatusCode.Conflict, e.Message);
+                    finalResponse.Status = (int)HTTPStatusCode.Conflict;
+                    finalResponse.Body = e.Message;
                 }
                 catch (ArgumentException e)
                 {
-  
-                    SetResponse(response, (int)HTTPStatusCode.BadRequest, e.Message);
-
+                    finalResponse.Status = (int)HTTPStatusCode.BadRequest;
+                    finalResponse.Body = e.Message;
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    SetResponse(response, (int)HTTPStatusCode.Unauthorized, e.Message);
+                    finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
+                    finalResponse.Body = e.Message;
                 }
             }
-            else
-            {
-                SetResponse(response, (int)HTTPStatusCode.NotFound, "Page not Found");
-            }
-            response.Send();
-        }
-        private void RegisterUser(HttpRequest request, HttpResponse response)
-        {
-            RegisterService registerService = new RegisterService();
-            string jsonBody = request.Body.ToString();
-            var dUser = JsonConvert.DeserializeObject<DeserializeUser>(jsonBody);
-            string token = registerService.Register(dUser.Username, dUser.Password);
-            SetResponse(response, (int)HTTPStatusCode.Created, "User created successfully");
-        }
-        private void CreateSession(HttpRequest request, HttpResponse response)
-        {
-            LoginService loginService = new LoginService();
-            string json = request.Body.ToString();
-            var dUser = JsonConvert.DeserializeObject<DeserializeUser>(json);
-            string token = loginService.Login(dUser.Username, dUser.Password);
-            SetResponse(response, (int)HTTPStatusCode.OK, token);
+            SendResponse(response, finalResponse.Status, finalResponse.Body);
         }
 
-        private void SetResponse(HttpResponse response, int status, string body)
+        private ResponseFormat RegisterUser(HttpRequest request)
         {
-            response.Status = $"{status.ToString()}";
+            RegisterService registerService = new RegisterService();
+            var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
+            string token = registerService.Register(dUser.Username, dUser.Password);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
+        }
+
+        private ResponseFormat CreateSession(HttpRequest request)
+        {
+            LoginService loginService = new LoginService();
+            var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
+            string token = loginService.Login(dUser.Username, dUser.Password);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = token };
+        }
+
+        private void SendResponse(HttpResponse response, int status, string body)
+        {
+            response.Status = status.ToString();
             response.Body = string.IsNullOrEmpty(body) ? "" : body;
+            response.Send();
             Console.WriteLine("Body: " + response.Body);
         }
     }
