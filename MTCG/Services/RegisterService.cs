@@ -10,8 +10,8 @@ namespace MTCG.Services
 {
     public class RegisterService
     {
-        private readonly LoginService _loginService = new LoginService();
-        public string Register(string name, string password)
+        private  readonly LoginService _loginService = new LoginService();
+        public  string Register(string name, string password)
         {
             var user = MTCGData.getUser(name.Trim());
             if(user != null) throw new InvalidOperationException("User already exists");

@@ -9,29 +9,7 @@ namespace MTCG.Database
 {
     public static class MTCGData
     {
-        public static List<User> Users { get; private set; } = new List<User>
-        {
-            new User("Mina", "Mina$2024"),
-            new User("JohnDoe", "JohnDoe!789"),
-            new User("AliceW", "Alice2023#"),
-            new User("BobSmith", "B0b$mith2024"),
-            new User("CathyBrown", "C@thy123"),
-            new User("DavidMiller", "David2024!"),
-            new User("EveJackson", "EveJ@ckson20"),
-            new User("FrankWhite", "Fr@nkW2023"),
-            new User("GraceHopper", "Grac3!Hopp"),
-            new User("HenryFord", "HenryF!123"),
-            new User("IsabellaJones", "Isa2024@Jones"),
-            new User("JamesBond", "J@mesB007"),
-            new User("KarenSmith", "K@ren!Smith"),
-            new User("LeoKing", "LeoK2023@"),
-            new User("MariaGarcia", "Maria!Gar123"),
-            new User("NathanDrake", "NathanD@rake"),
-            new User("OliviaRogers", "Olivia2024!"),
-            new User("PeterParker", "P@rk3r2023"),
-            new User("QuincyAdams", "Quincy@Adams"),
-            new User("RachelGreen", "RachelG!2024")
-        };
+        public static List<User> Users { get; private set; } = new List<User>();
 
         public static User? getUser(string name)
         {
