@@ -1,14 +1,8 @@
 ﻿using MTCG.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTCG.Services
 {
-    public class Battle
+    public class BattleService
     {
         public User LeftPlayer { get; private set; }
         public User RightPlayer { get; private set; }
@@ -34,9 +28,9 @@ namespace MTCG.Services
             RightPlayerLost,
             Playing
         }
-        public Battle(User leftPlayer, User rightPlayer)
+        public BattleService(User leftPlayer, User rightPlayer)
         {
-            LeftPlayer = leftPlayer; 
+            LeftPlayer = leftPlayer;
             RightPlayer = rightPlayer;
         }
 
@@ -66,7 +60,7 @@ namespace MTCG.Services
                 CurrentRound++;
             }
 
-            if(gameStatus == GameStatus.LeftPlayerLost)
+            if (gameStatus == GameStatus.LeftPlayerLost)
                 Console.WriteLine($"Left Player Lost - he has {LeftPlayer.cardsCount()} Cards left");
             if (gameStatus == GameStatus.RightPlayerLost)
                 Console.WriteLine($"Right Player Lost - he has {RightPlayer.cardsCount()} Cards left");
@@ -96,7 +90,7 @@ namespace MTCG.Services
         private int reCalcDamage(Card leftPlayerCard, Card rightPlayerCard)
         {
             int damage = leftPlayerCard.Damage;
-            switch(getEffectiveness(leftPlayerCard, rightPlayerCard))
+            switch (getEffectiveness(leftPlayerCard, rightPlayerCard))
             {
                 case Effectiveness.isEffective:
                     damage *= 2;
@@ -115,13 +109,13 @@ namespace MTCG.Services
             Effectiveness effectiveness = Effectiveness.noEffect;
 
             // Not Effective
-            if (leftE == ElementType.Fire && rightE == ElementType.Water || 
-             leftE == ElementType.Normal && rightE == ElementType.Fire || 
-            leftE == ElementType.Water && rightE == ElementType.Normal) effectiveness= Effectiveness.notEffective;
+            if (leftE == ElementType.Fire && rightE == ElementType.Water ||
+             leftE == ElementType.Normal && rightE == ElementType.Fire ||
+            leftE == ElementType.Water && rightE == ElementType.Normal) effectiveness = Effectiveness.notEffective;
 
             // Effective
-            else if (leftE == ElementType.Water && rightE == ElementType.Fire || 
-            leftE == ElementType.Fire && rightE == ElementType.Normal || 
+            else if (leftE == ElementType.Water && rightE == ElementType.Fire ||
+            leftE == ElementType.Fire && rightE == ElementType.Normal ||
             leftE == ElementType.Normal && rightE == ElementType.Water) effectiveness = Effectiveness.isEffective;
 
             // No Effect

@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTCG.Services.HTTP
 {
-    public class HttpServer
+    public class Server
     {
         private TcpListener _server;
         public IPAddress IpAddress { get; }
         public static int Port { get; private set; }
 
-        public HttpServer(IPAddress ipAddress, int port = 8000)
+        public Server(IPAddress ipAddress, int port = 8000)
         {
             IpAddress = ipAddress;
             Port = port;
@@ -24,13 +18,21 @@ namespace MTCG.Services.HTTP
 
         public void Start()
         {
-            _server.Start();
-            Console.WriteLine($"Server {IpAddress} waiting for connections...");
-            IncomingConnections();
+            try
+            {
+                _server.Start();
+                Console.WriteLine($"Server {IpAddress} waiting for connections...");
+                IncomingConnections();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Server not responding!");
+            }
+            
         }
 
         private void IncomingConnections()
-        {
+        { 
             while (true)
             {
                 var client = _server.AcceptTcpClient();

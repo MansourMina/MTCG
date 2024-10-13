@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace MTCG.Models
 {
-    public class DeserializeUser
-    {
-        public string? Username;
-        public string? Password;
-        public string? token;
-    }
+
     public class User
     {
         [JsonInclude]
@@ -25,7 +13,7 @@ namespace MTCG.Models
         public Stack Stack { get; private set; } = new Stack();
         public Deck Deck { get; private set; } = new Deck();
         public int Elo { get; private set; } = 100;
-        public string Token { get;  private set; }
+        public string Token { get; private set; }
         public Statistic statistic { get; private set; } = new Statistic();
 
         [JsonConstructor]
@@ -55,7 +43,7 @@ namespace MTCG.Models
 
         public void addLosses(int points)
         {
-            Elo -= Elo - points <= 0 ? 0:points;
+            Elo -= Elo - points <= 0 ? 0 : points;
             statistic.addLosses();
         }
 

@@ -6,8 +6,8 @@ GET http://localhost:8000/ HTTP/1.1
 
 ### a GET request from the integration-test script
 #curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer kienboec-mtcgToken"
-GET http://localhost:8000/cards HTTP/1.1
-Authorization: Bearer kienboec-mtcgToken
+# GET http://localhost:8000/cards HTTP/1.1
+# Authorization: Bearer kienboec-mtcgToken
 
 
 

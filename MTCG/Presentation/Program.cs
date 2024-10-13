@@ -1,9 +1,6 @@
-﻿using MTCG.Models;
-using MTCG.Services;
+﻿using MTCG.Services;
 using MTCG.Services.HTTP;
 using System.Net;
-using MTCG.Database;
-using System.Runtime.InteropServices;
 
 namespace MTCG.Presentation
 {
@@ -95,7 +92,7 @@ namespace MTCG.Presentation
             //       Battle battle = new Battle(leftPlayer, rightPlayer); 
             //       battle.start();
 
-
+            //Test Data
             List<Tuple<string, string>> Users = new List<Tuple<string, string>>
             {
                 Tuple.Create("Mina", "Mina$2024"),
@@ -124,10 +121,11 @@ namespace MTCG.Presentation
 
             foreach (var user in Users)
                 registerService.Register(user.Item1, user.Item2);
-            
-            HttpServer server = new HttpServer(IPAddress.Any, 8000);
+
+            // Start Server
+            Server server = new Server(IPAddress.Any);
             server.Start();
-            
+
         }
     }
 }

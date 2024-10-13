@@ -1,16 +1,11 @@
 ﻿using MTCG.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTCG.Models
 {
     public class Deck
     {
         public List<Card> Cards { get; private set; }
-        public Deck(int deck_size = Battle.DeckSize)
+        public Deck(int deck_size = BattleService.DeckSize)
         {
             Cards = new List<Card>(deck_size);
         }

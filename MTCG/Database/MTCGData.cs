@@ -1,9 +1,4 @@
 ﻿using MTCG.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTCG.Database
 {
@@ -13,7 +8,7 @@ namespace MTCG.Database
 
         public static User? getUser(string name)
         {
-            foreach(var user in Users)
+            foreach (var user in Users)
             {
                 if (user.Username == name) return user;
             }

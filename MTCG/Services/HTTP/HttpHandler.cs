@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MTCG.Models;
 using System.Text.Json;
-using MTCG.Models;
-using Newtonsoft.Json.Linq;
-using static MTCG.Services.HTTP.HttpHandler;
 namespace MTCG.Services.HTTP
 {
     public class HttpHandler

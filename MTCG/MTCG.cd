@@ -1,145 +1,199 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MTCG.Models.Cards.MonsterCards.Dragon">
+    <Position X="0.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\Dragon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Cards.MonsterCards.FireElves">
+    <Position X="2.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\FireElves.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Cards.MonsterCards.Goblin">
+    <Position X="2.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\Goblin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Cards.MonsterCards.Knights">
+    <Position X="0.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\Knights.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Cards.MonsterCards.Kraken">
+    <Position X="2.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\Kraken.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Cards.MonsterCards.Orks">
+    <Position X="0.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\Orks.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Cards.MonsterCards.Wizzard">
+    <Position X="0.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Cards\MonsterCards\Wizzard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="MTCG.Models.Card">
-    <Position X="3.75" Y="0.5" Width="1.5" />
+    <Position X="3.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAABACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.Deck">
-    <Position X="11" Y="6.75" Width="1.5" />
+    <Position X="8.25" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAABAAAAAAAAAAIAAAAAAQAAAAAAAAAACA=</HashCode>
       <FileName>Models\Deck.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="MTCG.Models.MonsterCard">
+    <Position X="1.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\MonsterCard.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="MTCG.Models.SpellCard">
-    <Position X="6.25" Y="3" Width="1.5" />
+    <Position X="5.5" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\SpellCard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.Stack">
-    <Position X="7.25" Y="7.25" Width="1.5" />
+    <Position X="8.25" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAABAAAAAAAAAAIAAAAAAQAAAAAAAgAACA=</HashCode>
       <FileName>Models\Stack.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="MTCG.Models.Statistic">
+    <Position X="4.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAgAAAAAAAEAAAEAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Statistic.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="MTCG.Models.User">
-    <Position X="9" Y="6.25" Width="1.5" />
+    <Position X="6.5" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAQAIAoAAAAAQAECAAEoAAAAAACAIBIAAABAAA=</HashCode>
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Services.Battle">
-    <Position X="13.5" Y="2.5" Width="1.5" />
+  <Class Name="MTCG.Services.HTTP.HttpHandler">
+    <Position X="14.75" Y="3.5" Width="1.5" />
     <NestedTypes>
-      <Enum Name="MTCG.Services.Battle.Effectiveness" Collapsed="true">
+      <Enum Name="MTCG.Services.HTTP.HttpHandler.HTTPStatusCode" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>Services\Battle.cs</NewMemberFileName>
+          <NewMemberFileName>Services\HTTP\HttpHandler.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Enum Name="MTCG.Services.Battle.GameStatus" Collapsed="true">
+      <Struct Name="MTCG.Services.HTTP.HttpHandler.ResponseFormat" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>Services\Battle.cs</NewMemberFileName>
+          <NewMemberFileName>Services\HTTP\HttpHandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>EAAAABAAAAAAABAAAEAAAAAAIAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\HTTP\HttpHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Services.HTTP.HttpRequest">
+    <Position X="16.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAAAQAAAAAAAAAIAAAAhAAAACAAAAAAAIAAAAAIAAAA=</HashCode>
+      <FileName>Services\HTTP\HttpRequest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Services.HTTP.HttpResponse">
+    <Position X="13" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAEABAAAAAAAAAAAAAAAQAAEAAAA=</HashCode>
+      <FileName>Services\HTTP\HttpResponse.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Services.HTTP.Server">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAACAAAAAAQACAAAAACAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Services\HTTP\Server.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Services.BattleService">
+    <Position X="10.75" Y="5.75" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="MTCG.Services.BattleService.Effectiveness" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Services\BattleService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="MTCG.Services.BattleService.GameStatus" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Services\BattleService.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>EAAAAgICAAAAAAAwAAAICAAAAEAAAUAAAEAAACAAAEA=</HashCode>
-      <FileName>Services\Battle.cs</FileName>
+      <FileName>Services\BattleService.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Services.Login" Collapsed="true">
-    <Position X="11.5" Y="4.25" Width="1.5" />
+  <Class Name="MTCG.Services.LoginService">
+    <Position X="15.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\Login.cs</FileName>
+      <HashCode>AAAAAAEAAAAAAAAAAAAEAAIAAAQAAAAAAAAQAAAAAgA=</HashCode>
+      <FileName>Services\LoginService.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Services.Package" Collapsed="true">
-    <Position X="11.5" Y="2.75" Width="1.5" />
+  <Class Name="MTCG.Services.PackageService" Collapsed="true">
+    <Position X="11.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\Package.cs</FileName>
+      <FileName>Services\PackageService.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Services.Register" Collapsed="true">
-    <Position X="11.5" Y="3.5" Width="1.5" />
+  <Class Name="MTCG.Services.RegisterService">
+    <Position X="14" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\Register.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\RegisterService.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="MTCG.Cards.MonsterCards.Wizzard">
-    <Position X="0.75" Y="5.25" Width="1.5" />
+  <Class Name="MTCG.Database.MTCGData">
+    <Position X="7.5" Y="2.5" Width="5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\Wizzard.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Cards.MonsterCards.Dragon">
-    <Position X="0.75" Y="7" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\Dragon.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Cards.MonsterCards.FireElves">
-    <Position X="2.75" Y="7.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\FireElves.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Cards.MonsterCards.Goblin">
-    <Position X="3" Y="5.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\Goblin.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Cards.MonsterCards.Knights">
-    <Position X="0.75" Y="8.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\Knights.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Cards.MonsterCards.Kraken">
-    <Position X="2.75" Y="8.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\Kraken.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Cards.MonsterCards.Orks">
-    <Position X="4.75" Y="7" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Cards\MonsterCards\Orks.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Models.MonsterCard">
-    <Position X="1.25" Y="3" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\MonsterCard.cs</FileName>
+      <HashCode>AAAAACAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAIBAAAAA=</HashCode>
+      <FileName>Database\MTCGData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Enum Name="MTCG.Models.ElementType">
-    <Position X="10" Y="0.5" Width="1.5" />
+    <Position X="9.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="MTCG.Models.CardType">
-    <Position X="8.25" Y="0.5" Width="1.5" />
+    <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>

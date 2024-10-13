@@ -1,10 +1,5 @@
 ﻿using MTCG.Database;
 using MTCG.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MTCG.Services
 {
@@ -19,7 +14,7 @@ namespace MTCG.Services
         {
             var user = MTCGData.getUser(name);
             string? existingUserToken = isLoggedIn(user);
-            if(existingUserToken != null) return existingUserToken;
+            if (existingUserToken != null) return existingUserToken;
             if (user != null && BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
                 return CreateToken(user);
             throw new UnauthorizedAccessException("Invalid username or password");
@@ -46,8 +41,8 @@ namespace MTCG.Services
             if (user == null) return null;
             string token = null;
             foreach (var u in _tokens)
-                if (u.Value == user) token= u.Key;
+                if (u.Value == user) token = u.Key;
             return token;
-        } 
+        }
     }
 }
