@@ -43,7 +43,3 @@ The current version focuses on setting up the foundational features, ensuring th
 ## Testing
 
 To test the current functionality, use the provided CURL scripts. The integration tests cover user registration and login up to the token generation phase.
-
-## Contributing
-
-Please refer to the [GitHub repository](#) for contribution guidelines and further details.
