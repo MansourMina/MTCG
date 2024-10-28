@@ -67,5 +67,15 @@ namespace MTCG.Models
             if (Guid.TryParse(token, out Guid parsedGuid)) Token = token;
         }
 
+        public void setCoins(int coins)
+        {
+            Coins = coins;
+        }
+
+        public void setElo(int elo)
+        {
+            Elo = elo;
+        }
+
     }
 }

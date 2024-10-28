@@ -1,18 +1,17 @@
 ﻿using MTCG.Database;
+using MTCG.Database.Repositories;
 using MTCG.Models;
 
 namespace MTCG.Services
 {
     public class LoginService
     {
-        private static Dictionary<string, User> _tokens;
-        public LoginService()
-        {
-            _tokens = new Dictionary<string, User>();
-        }
+        private static Dictionary<string, User> _tokens = new Dictionary<string, User>();
+        private readonly UserRepository? _dbUser = new UserRepository();
+
         public string Login(string name, string password)
         {
-            var user = MTCGData.getUser(name);
+            var user = _dbUser?.GetByUsername(name.Trim());
             string? existingUserToken = isLoggedIn(user);
             if (existingUserToken != null) return existingUserToken;
             if (user != null && BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
