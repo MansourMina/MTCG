@@ -11,7 +11,7 @@ namespace MTCG.Services
 
         public string Login(string name, string password)
         {
-            var user = _dbUser?.GetByUsername(name.Trim());
+            var user = _dbUser?.Get(name.Trim());
             string? existingUserToken = isLoggedIn(user);
             if (existingUserToken != null) return existingUserToken;
             if (user != null && BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
