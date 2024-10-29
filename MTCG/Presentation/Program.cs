@@ -1,6 +1,7 @@
 ﻿using MTCG.Services;
 using MTCG.Services.HTTP;
 using System;
+using System.Collections;
 using System.Net;
 
 namespace MTCG.Presentation
@@ -121,9 +122,10 @@ namespace MTCG.Presentation
             //var registerService = new RegisterService();
 
             //foreach (var user in Users)
-                //registerService.Register(user.Item1, user.Item2);
+            //registerService.Register(user.Item1, user.Item2);
 
             // Start Server
+
             Server server = new Server(IPAddress.Any);
             server.Start();
 

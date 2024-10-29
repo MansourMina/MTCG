@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Npgsql;
 
 namespace MTCG.Database
@@ -15,9 +17,20 @@ namespace MTCG.Database
         {
             get
             {
+                string? envConnString = Environment.GetEnvironmentVariable("MTCGDatabaseConnection");
+
+                if (string.IsNullOrEmpty(envConnString))
+                {
+                    throw new InvalidOperationException("Could not connect to the database!");
+                }
+
                 if (_instance == null)
-                    _instance = new DataLayer("Host=localhost;Database=mtcg;Username=postgres;Password=postgres;Persist Security Info=True");
+                {
+                    if (_instance == null)
+                        _instance = new DataLayer(envConnString);
+                }
                 return _instance;
+
             }
         }
 
