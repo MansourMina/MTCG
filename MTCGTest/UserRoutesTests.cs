@@ -2,40 +2,44 @@ using Moq;
 using MTCG.Database.Repositories;
 using MTCG.Models;
 using MTCG.Services;
+using NSubstitute;
 
 namespace MTCGTest
 {
     public class UserTests
     {
 
-        private LoginService _loginService;
-        private RegisterService _registerService;
-        private Mock<UserRepository> _mockUserRepository;
+        LoginService mockedLoginService;
+        RegisterService mockedRegisterService;
+        UserRepository mockedUserRepository;
 
         [SetUp]
         public void Setup()
         {
-            _mockUserRepository = new Mock<UserRepository>();
-            _loginService = new LoginService();
-            _registerService = new RegisterService();
+            mockedLoginService = Substitute.For<LoginService>();
+            mockedRegisterService = Substitute.For<RegisterService>();
+            mockedUserRepository = Substitute.For<UserRepository>();
         }
 
         [Test]
-        public void Register_User()
+        public void Register_User_ShouldReturnTokenAndVerifySuccessfully()
         {
-            //// Arrange
-            //var username = "testUser";
-            //var password = "testPassword";
-            //var user = new User(username, BCrypt.Net.BCrypt.HashPassword(password));
+            // Arrange
+            var username = "testUser";
+            var password = "testPassword";
+            var expectedToken = "";
 
-            //_mockUserRepository.Setup(repo => repo.Get(username.Trim())).Returns(user);
+            mockedRegisterService.Register(username, password).Returns(expectedToken);
 
-            //// Act
-            //var token = _loginService.Login(username, password);
+            // Act
+            var token = mockedRegisterService.Register(username, password);
 
-            //// Assert
-            //Assert.IsNotNull(token);
-            //Assert.IsTrue(_loginService.VerifyToken(token));
+            // Assert
+            Assert.IsNotNull(token);
+            Assert.AreEqual(expectedToken, token);
+
+            mockedLoginService.VerifyToken(token).Returns(true);
+            Assert.IsTrue(mockedLoginService.VerifyToken(token));
         }
     }
 }

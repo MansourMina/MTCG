@@ -12,20 +12,32 @@ namespace MTCG.Services.HTTP
         public StringBuilder Body { get; private set; } = new StringBuilder();
         public HttpRequest(StreamReader reader)
         {
-            readHttp(reader);
-            readHeader(reader);
-            readBody(reader);
+            try
+            {
+                readHttp(reader);
+                readHeader(reader);
+                readBody(reader);
+            }catch(InvalidDataException)
+            {
+                throw;
+            }
+            
         }
 
         private void readHttp(StreamReader reader)
         {
-            string? line;
-            line = reader.ReadLine();
+            string? line = reader.ReadLine();
+            if (line == null)
+                throw new InvalidDataException("The HTTP request is incomplete or invalid");
+
             var httpParts = line.Split(' ');
+            if (httpParts.Length < 3)
+                throw new InvalidDataException("The HTTP request line is incomplete");
+
             Method = httpParts[0];
             Path = httpParts[1];
             Version = httpParts[2];
-        }
+         }
 
         private void readHeader(StreamReader reader)
         {

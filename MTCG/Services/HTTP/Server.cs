@@ -21,12 +21,12 @@ namespace MTCG.Services.HTTP
             try
             {
                 _server.Start();
-                Console.WriteLine($"Server {IpAddress} waiting for connections...");
+                Console.WriteLine($"Server {IpAddress}:{Port} waiting for connections...");
                 IncomingConnections();
             }
             catch (Exception e)
             {
-                Console.WriteLine("Server not responding!");
+                Console.WriteLine($"Server Error: {e.Message}");
             }
             
         }
@@ -44,11 +44,22 @@ namespace MTCG.Services.HTTP
 
         private void HandleConnection(TcpClient client, StreamReader reader, StreamWriter writer)
         {
-            HttpRequest request = new HttpRequest(reader);
-            HttpResponse response = new HttpResponse(writer);
-            HttpHandler handler = new HttpHandler(request, response);
+            try
+            {
+                HttpRequest request = new HttpRequest(reader);
+                HttpResponse response = new HttpResponse(writer);
+                HttpHandler handler = new HttpHandler(request, response);
 
-            Console.WriteLine($"Response Status: {response.Status} ");
+                Console.WriteLine($"Response Status: {response.Status}");
+            }
+            catch (InvalidDataException ex)
+            {
+                Console.WriteLine($"Invalid data received: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
 
         }
     }

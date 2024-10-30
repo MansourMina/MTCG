@@ -21,16 +21,12 @@ namespace MTCG.Database
 
                 if (string.IsNullOrEmpty(envConnString))
                 {
-                    throw new InvalidOperationException("Could not connect to the database!");
+                    throw new InvalidOperationException("Database connection failed!");
                 }
 
-                if (_instance == null)
-                {
-                    if (_instance == null)
+                if (_instance == null)   
                         _instance = new DataLayer(envConnString);
-                }
                 return _instance;
-
             }
         }
 

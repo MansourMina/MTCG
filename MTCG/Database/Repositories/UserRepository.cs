@@ -51,7 +51,6 @@ namespace MTCG.Database.Repositories
 
         public User? Get(string username)
         {
-            Console.WriteLine("Username: " + username);
             var commandText = """SELECT username, password, coins, elo from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username.Trim());

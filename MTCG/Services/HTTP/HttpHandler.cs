@@ -95,6 +95,8 @@ namespace MTCG.Services.HTTP
         {
             RegisterService registerService = new RegisterService();
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
+            if (dUser == null)
+                throw new KeyNotFoundException($"Failed to register user");
             string token = registerService.Register(dUser.Username, dUser.Password);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
@@ -103,6 +105,8 @@ namespace MTCG.Services.HTTP
         {
             LoginService loginService = new LoginService();
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
+            if (dUser == null)
+                throw new KeyNotFoundException($"Failed to create session");
             string token = loginService.Login(dUser.Username, dUser.Password);
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = token };
         }

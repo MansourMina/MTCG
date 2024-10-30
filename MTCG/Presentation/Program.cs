@@ -6,11 +6,6 @@ using System.Net;
 
 namespace MTCG.Presentation
 {
-    struct user
-    {
-        public string Username;
-        public string Password;
-    }
     internal class Program
     {
         static void Main(string[] args)
@@ -126,9 +121,15 @@ namespace MTCG.Presentation
 
             // Start Server
 
+            startServer();
+            
+
+        }
+
+        static void startServer()
+        {
             Server server = new Server(IPAddress.Any);
             server.Start();
-
         }
     }
 }
