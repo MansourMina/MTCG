@@ -5,7 +5,7 @@ using NSubstitute;
 
 namespace MTCGTest
 {
-    public class TestDataServiceTests
+    public class DataServiceTests
     {
         private LoginService _mockedLoginService;
         private RegisterService _registerService;

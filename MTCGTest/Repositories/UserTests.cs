@@ -1,6 +1,6 @@
 using MTCG.Models;
 
-namespace MTCGTest
+namespace MTCGTest.Repositories
 {
     public class UserTests
     {
@@ -9,7 +9,7 @@ namespace MTCGTest
         [SetUp]
         public void Setup()
         {
-            
+
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace MTCGTest
             user.SetCoins(coins);
 
             // Assert
-            Assert.That(user.Elo, Is.EqualTo(elo)); 
+            Assert.That(user.Elo, Is.EqualTo(elo));
             Assert.That(user.Coins, Is.EqualTo(coins));
 
         }
@@ -77,7 +77,7 @@ namespace MTCGTest
             user.AddWin(pointsToAdd);
 
             // Assert
-            Assert.That(user.Elo, Is.EqualTo(110)); 
+            Assert.That(user.Elo, Is.EqualTo(110));
             Assert.That(user.statistic.Wins, Is.EqualTo(1));
         }
 
@@ -143,13 +143,13 @@ namespace MTCGTest
             string username = "testUser";
             string password = "$2a$12$hashedpassword";
             User user = new User(username, password);
-            string newPassword = "$2a$12$newhashedpassword"; 
+            string newPassword = "$2a$12$newhashedpassword";
 
             // Act
             user.ChangePassword(newPassword);
 
             // Assert
-            Assert.That(user.Password, Is.EqualTo(newPassword)); 
+            Assert.That(user.Password, Is.EqualTo(newPassword));
         }
 
     }
