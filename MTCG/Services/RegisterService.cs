@@ -20,7 +20,7 @@ namespace MTCG.Services
             _loginService = new LoginService();
             _userRepository = new UserRepository();
         }
-        public  string Register(string name, string password)
+        public string Register(string name, string password)
         {
             var user = _userRepository?.Get(name.Trim());
             if (user != null) throw new InvalidOperationException("User already exists");
