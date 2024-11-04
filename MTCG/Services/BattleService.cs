@@ -61,9 +61,9 @@ namespace MTCG.Services
             }
 
             if (gameStatus == GameStatus.LeftPlayerLost)
-                Console.WriteLine($"Left Player Lost - he has {LeftPlayer.cardsCount()} Cards left");
+                Console.WriteLine($"Left Player Lost - he has {LeftPlayer.CardsCount()} Cards left");
             if (gameStatus == GameStatus.RightPlayerLost)
-                Console.WriteLine($"Right Player Lost - he has {RightPlayer.cardsCount()} Cards left");
+                Console.WriteLine($"Right Player Lost - he has {RightPlayer.CardsCount()} Cards left");
             else
             {
                 Console.WriteLine($"{(RightPlayer.statistic.Wins > LeftPlayer.statistic.Wins ? "Right" : "Left")} WON");
@@ -127,22 +127,22 @@ namespace MTCG.Services
         {
             if (leftPlayerDamage > rightPlayerDamage)
             {
-                LeftPlayer.addWin(WinningPoints);
-                RightPlayer.addLosses(LosingPoints);
+                LeftPlayer.AddWin(WinningPoints);
+                RightPlayer.AddLosses(LosingPoints);
                 LeftPlayer.Deck.addCard(rightPlayerCard);
                 removeCardFromPlayer(RightPlayer, rightPlayerCard);
             }
             else if (rightPlayerDamage < leftPlayerDamage)
             {
-                LeftPlayer.addLosses(LosingPoints);
-                RightPlayer.addWin(WinningPoints);
+                LeftPlayer.AddLosses(LosingPoints);
+                RightPlayer.AddWin(WinningPoints);
                 RightPlayer.Deck.addCard(leftPlayerCard);
                 removeCardFromPlayer(LeftPlayer, leftPlayerCard);
             }
             else
             {
-                LeftPlayer.addDraw();
-                RightPlayer.addDraw();
+                LeftPlayer.AddDraw();
+                RightPlayer.AddDraw();
             }
         }
 
@@ -156,8 +156,8 @@ namespace MTCG.Services
 
         public GameStatus checkGameOver()
         {
-            if (LeftPlayer.noCardsLeft()) return GameStatus.LeftPlayerLost;
-            if (RightPlayer.noCardsLeft()) return GameStatus.RightPlayerLost;
+            if (LeftPlayer.NoCardsLeft()) return GameStatus.LeftPlayerLost;
+            if (RightPlayer.NoCardsLeft()) return GameStatus.RightPlayerLost;
             return GameStatus.Playing;
         }
     }

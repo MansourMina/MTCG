@@ -46,6 +46,7 @@ namespace MTCG.Services.HTTP
             Routes[Tuple.Create("/users", "POST")] = RegisterUser;
             Routes[Tuple.Create("/users", "GET")] = GetUser;
             Routes[Tuple.Create("/users", "DELETE")] = DeleteUser;
+            Routes[Tuple.Create("/users", "PATCH")] = UpdateUser;
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -72,7 +73,7 @@ namespace MTCG.Services.HTTP
                     finalResponse.Status = (int)HTTPStatusCode.Conflict;
                     finalResponse.Body = e.Message;
                 }
-                catch(KeyNotFoundException e)
+                catch (KeyNotFoundException e)
                 {
                     finalResponse.Status = (int)HTTPStatusCode.NotFound;
                     finalResponse.Body = e.Message;
@@ -96,7 +97,7 @@ namespace MTCG.Services.HTTP
             RegisterService registerService = new RegisterService();
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
             if (dUser == null)
-                throw new KeyNotFoundException($"Failed to register user");
+                throw new ArgumentException($"Failed to register user");
             string token = registerService.Register(dUser.Username, dUser.Password);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
@@ -106,7 +107,7 @@ namespace MTCG.Services.HTTP
             LoginService loginService = new LoginService();
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
             if (dUser == null)
-                throw new KeyNotFoundException($"Failed to create session");
+                throw new ArgumentException($"Failed to create session");
             string token = loginService.Login(dUser.Username, dUser.Password);
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = token };
         }
@@ -123,7 +124,8 @@ namespace MTCG.Services.HTTP
                     throw new KeyNotFoundException($"User '{query}' does not exist");
                 response.Body = JsonSerializer.Serialize(user);
             }
-            else { 
+            else
+            {
                 var users = dbUser.GetAll();
                 response.Body = JsonSerializer.Serialize(users);
             }
@@ -132,7 +134,11 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat DeleteUser(HttpRequest request)
         {
-            string username = request.Path.Split('/')[2];
+            string[] pathParts = request.Path.Split('/');
+            if (pathParts.Length <= 2)
+                throw new ArgumentException($"Failed to delete user");
+
+            string username = pathParts[2];
             UserRepository dbUser = new UserRepository();
             int rowsAffected = dbUser.Delete(username);
             if (rowsAffected == 0)
@@ -140,14 +146,59 @@ namespace MTCG.Services.HTTP
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = "User deleted successfully" };
         }
 
+        private ResponseFormat UpdateUser(HttpRequest request)
+        {
+            string[] pathParts = request.Path.Split('/');
+            var body = JsonSerializer.Deserialize<User>(request.Body.ToString());
+            if (body == null || pathParts.Length <= 2)
+                throw new ArgumentException($"Failed to update user");
+
+            string username = pathParts[2];
+
+            UserRepository dbUser = new UserRepository();
+            var user = dbUser.Get(username);
+            if (user == null)
+                throw new KeyNotFoundException($"User '{username}' does not exist");
+
+
+            ChangeUserProperties(user, body);
+            dbUser.Update(username, user);
+
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User updated successfully" };
+        }
+
+        private void ChangeUserProperties(User user, User body)
+        {
+            bool propertiesChanged = false;
+            if (!string.IsNullOrEmpty(body.Password))
+            {
+                user.ChangePassword(BCrypt.Net.BCrypt.EnhancedHashPassword(body.Password));
+                propertiesChanged = true;
+            }
+            if (!string.IsNullOrEmpty(body.Username))
+            { 
+                user.ChangeUsername(body.Username);
+                propertiesChanged = true;
+            }
+            if (body.Elo.HasValue)
+            { 
+                user.SetElo(body.Elo.Value);
+                propertiesChanged = true;
+            }
+            if (body.Coins.HasValue)
+            { 
+                user.SetCoins(body.Coins.Value);
+                propertiesChanged = true;
+            }
+            if(!propertiesChanged) throw new ArgumentException($"Failed to update user");
+
+        }
         public static string GetMainRoute(string url)
         {
             var path = url.Split('?')[0];
             var segments = path.Split('/');
-
             return segments.Length > 1 ? "/" + segments[1] : "/";
         }
-
 
         private void SendResponse(HttpResponse response, int status, string body)
         {
@@ -162,10 +213,7 @@ namespace MTCG.Services.HTTP
             var query = HttpUtility.ParseQueryString(uri.Query);
 
             if (query.AllKeys.Contains(queryName))
-            {
-                return query[queryName]; 
-            }
-
+                return query[queryName];
             return null;
         }
     }

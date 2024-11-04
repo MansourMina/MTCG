@@ -3,43 +3,42 @@ using MTCG.Database.Repositories;
 using MTCG.Models;
 using MTCG.Services;
 using NSubstitute;
+using NUnit.Framework;
 
 namespace MTCGTest
 {
     public class UserTests
     {
-
-        LoginService mockedLoginService;
-        RegisterService mockedRegisterService;
-        UserRepository mockedUserRepository;
+        private LoginService _mockedLoginService;
+        private RegisterService _registerService;
+        private UserRepository _mockedUserRepository;
 
         [SetUp]
         public void Setup()
         {
-            mockedLoginService = Substitute.For<LoginService>();
-            mockedRegisterService = Substitute.For<RegisterService>();
-            mockedUserRepository = Substitute.For<UserRepository>();
+            _mockedUserRepository = Substitute.For<UserRepository>();
+            _mockedLoginService = Substitute.For<LoginService>(_mockedUserRepository);
+            _registerService = new RegisterService(_mockedLoginService, _mockedUserRepository);
         }
 
         [Test]
         public void Register_User_ShouldReturnTokenAndVerifySuccessfully()
         {
             // Arrange
-            var username = "testUser";
-            var password = "testPassword";
-            var expectedToken = "";
+            string username = "testUser";
+            string password = "testPassword";
+            string expectedToken = "";
 
-            mockedRegisterService.Register(username, password).Returns(expectedToken);
+            _mockedLoginService.CreateToken(Arg.Any<User>()).Returns(expectedToken);
 
             // Act
-            var token = mockedRegisterService.Register(username, password);
+            string token = _registerService.Register(username, password);
+
 
             // Assert
-            Assert.IsNotNull(token);
-            Assert.AreEqual(expectedToken, token);
-
-            mockedLoginService.VerifyToken(token).Returns(true);
-            Assert.IsTrue(mockedLoginService.VerifyToken(token));
+            Assert.That(token, Is.Not.Null); 
+            Assert.That(token, Is.EqualTo(expectedToken));
+            _mockedUserRepository.Received(1).Add(Arg.Is<User>(u => u.Username == username));
         }
     }
 }
