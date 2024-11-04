@@ -1,6 +1,6 @@
-﻿namespace MTCG.Models
+﻿namespace MTCG.Services
 {
-    public class Statistic
+    public class StatisticService
     {
         public int Wins { get; private set; }
         public int Losses { get; private set; }

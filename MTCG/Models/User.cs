@@ -1,5 +1,6 @@
 ﻿using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
+using MTCG.Services;
 
 namespace MTCG.Models
 {
@@ -18,27 +19,27 @@ namespace MTCG.Models
         [JsonInclude]
         public int? Elo { get; private set; }
         public string Token { get; private set; }
-        public Statistic statistic { get; private set; } = new Statistic();
+        public StatisticService statistic { get; private set; } = new StatisticService();
 
         [JsonConstructor]
         private User() { }
         public User(string name, string password)
         {
-            _setCredentials(name, password);
+            _setProperties(name, password);
         }
 
         public User(string name, string password, Stack stack)
         {
-            _setCredentials(name, password);
+            _setProperties(name, password);
             Stack = stack;
-            Coins = 20;
-            Elo = 100;
         }
 
-        private void _setCredentials(string name, string password)
+        private void _setProperties(string name, string password)
         {
             Username = name;
             Password = password;
+            Coins = 20;
+            Elo = 100;
         }
 
         public void AddWin(int points)
@@ -49,7 +50,7 @@ namespace MTCG.Models
 
         public void AddLosses(int points)
         {
-            Elo -= Elo - points <= 0 ? 0 : points;
+            Elo = (Elo - points < 0) ? 0 : Elo - points;
             statistic.addLosses();
         }
 

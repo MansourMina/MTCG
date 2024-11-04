@@ -7,6 +7,7 @@ using System.IO;
 using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Web;
+using static System.Collections.Specialized.BitVector32;
 namespace MTCG.Services.HTTP
 {
     public class HttpHandler
@@ -191,8 +192,8 @@ namespace MTCG.Services.HTTP
                 propertiesChanged = true;
             }
             if(!propertiesChanged) throw new ArgumentException($"Failed to update user");
-
         }
+
         public static string GetMainRoute(string url)
         {
             var path = url.Split('?')[0];
