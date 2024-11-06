@@ -7,12 +7,13 @@ namespace MTCG.Services
     public class LoginService
     {
         private static Dictionary<string, string> _tokens = new Dictionary<string, string>();
-        private readonly UserRepository? _userRepository;
+        private readonly IUserRepository? _userRepository;
 
-        public LoginService() {
+        public LoginService()
+        {
             _userRepository = new UserRepository();
         }
-        public LoginService(UserRepository userRepository)
+        public LoginService(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
@@ -40,13 +41,14 @@ namespace MTCG.Services
             if (VerifyToken(token)) _tokens.Remove(token);
         }
 
-        private  string? isLoggedIn(User user)
+        private string? isLoggedIn(User user)
         {
             if (user == null) return null;
             string? token = null;
             foreach (var u in _tokens)
             {
-                if (u.Value == user.Username) token = u.Key;
+                if (u.Value == user.Username)
+                    return u.Key;
             }
             return token;
         }

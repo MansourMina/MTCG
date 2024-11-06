@@ -3,6 +3,7 @@ using MTCG.Models;
 using MTCG.Presentation;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Data;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Text.Json;
@@ -69,6 +70,11 @@ namespace MTCG.Services.HTTP
                     finalResponse.Status = responseFormat.Status;
                     finalResponse.Body = responseFormat.Body;
                 }
+                catch(DuplicateNameException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.Conflict;
+                    finalResponse.Body = e.Message;
+                }
                 catch (InvalidOperationException e)
                 {
                     finalResponse.Status = (int)HTTPStatusCode.Conflict;
@@ -99,7 +105,7 @@ namespace MTCG.Services.HTTP
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString());
             if (dUser == null)
                 throw new ArgumentException($"Failed to register user");
-            string token = registerService.Register(dUser.Username, dUser.Password);
+            registerService.Register(dUser.Username, dUser.Password);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
 
@@ -177,7 +183,9 @@ namespace MTCG.Services.HTTP
                 propertiesChanged = true;
             }
             if (!string.IsNullOrEmpty(body.Username))
-            { 
+            {
+                UserRepository dbUser = new UserRepository();
+                if(dbUser.Get(body.Username) != null) throw new DuplicateNameException($"Username '{body.Username}' is already taken");
                 user.ChangeUsername(body.Username);
                 propertiesChanged = true;
             }

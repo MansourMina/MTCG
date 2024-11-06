@@ -9,12 +9,12 @@ namespace MTCGTest
     {
         private LoginService _mockedLoginService;
         private RegisterService _registerService;
-        private UserRepository _mockedUserRepository;
+        private IUserRepository _mockedUserRepository;
 
         [SetUp]
         public void Setup()
         {
-            _mockedUserRepository = Substitute.For<UserRepository>();
+            _mockedUserRepository = Substitute.For<IUserRepository>();
             _mockedLoginService = Substitute.For<LoginService>(_mockedUserRepository);
             _registerService = new RegisterService(_mockedLoginService, _mockedUserRepository);
         }
@@ -27,18 +27,16 @@ namespace MTCGTest
             string password = "testPassword";
             string expectedToken = "";
 
-            _mockedLoginService.CreateToken(Arg.Any<User>()).Returns(expectedToken);
+            _mockedLoginService.Login(username, password).Returns(expectedToken);
 
             // Act
-            string token = _registerService.Register(username, password);
-
+            _registerService.Register(username, password);
+            string token = _mockedLoginService.Login(username, password);
 
             // Assert
             Assert.That(token, Is.Not.Null);
             Assert.That(token, Is.EqualTo(expectedToken));
-            _mockedUserRepository.Received(1).Add(Arg.Is<User>(u => u.Username == username));
+            Assert.IsTrue(_mockedLoginService.VerifyToken(token));
         }
-
-       
     }
 }

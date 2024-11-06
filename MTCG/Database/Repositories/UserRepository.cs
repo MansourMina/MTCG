@@ -1,20 +1,14 @@
 ﻿using MTCG.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace MTCG.Database.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private static readonly DataLayer _dal = DataLayer.Instance;
 
-        public virtual void Add(User user)
+        public  void Add(User user)
         {
             var commandText = """
                 INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id)
@@ -29,7 +23,7 @@ namespace MTCG.Database.Repositories
             command.ExecuteNonQuery();
         }
 
-        public virtual List<User> GetAll()
+        public  List<User> GetAll()
         {
             var commandText = """
             SELECT username, password, coins, elo 
@@ -49,7 +43,7 @@ namespace MTCG.Database.Repositories
             return result;
         }
 
-        public virtual User? Get(string username)
+        public  User? Get(string username)
         {
             var commandText = """SELECT username, password, coins, elo from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -67,7 +61,7 @@ namespace MTCG.Database.Repositories
             return null;
         }
 
-        public virtual void Update(string username, User user)
+        public  void Update(string username, User user)
         {
 
             var commandText = """
@@ -84,7 +78,7 @@ namespace MTCG.Database.Repositories
             command.ExecuteNonQuery();
         }
 
-        public virtual int Delete(string username)
+        public  int Delete(string username)
         {
             var commandText = """DELETE from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);

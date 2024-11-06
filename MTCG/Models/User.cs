@@ -86,13 +86,7 @@ namespace MTCG.Models
 
         public void ChangePassword(string password)
         {
-            if (!IsPasswordHashed(password)) throw new UnauthorizedAccessException("Failed to change Password");
             Password = password;
-        }
-
-        private bool IsPasswordHashed(string password)
-        {
-            return password.StartsWith("$2a$") || password.StartsWith("$2b$") || password.StartsWith("$2y$");
         }
 
         internal void ChangeUsername(string username)

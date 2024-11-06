@@ -7,9 +7,9 @@ namespace MTCG.Services
     public class RegisterService
     {
         private readonly LoginService _loginService;
-        private readonly UserRepository? _userRepository;
+        private readonly IUserRepository? _userRepository;
 
-        public RegisterService(LoginService loginService, UserRepository userRepository)
+        public RegisterService(LoginService loginService, IUserRepository userRepository)
         {
             _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
@@ -20,7 +20,7 @@ namespace MTCG.Services
             _loginService = new LoginService();
             _userRepository = new UserRepository();
         }
-        public string Register(string name, string password)
+        public void Register(string name, string password)
         {
             var user = _userRepository?.Get(name.Trim());
             if (user != null) throw new InvalidOperationException("User already exists");
@@ -29,7 +29,6 @@ namespace MTCG.Services
 
             var newUser = new User(name, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
             _userRepository?.Add(newUser);
-            return _loginService.CreateToken(newUser);
         }
 
     }
