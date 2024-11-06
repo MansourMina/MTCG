@@ -45,18 +45,18 @@ namespace MTCG.Models
         public void AddWin(int points)
         {
             Elo += points;
-            statistic.addWin();
+            statistic.AddWin();
         }
 
         public void AddLosses(int points)
         {
             Elo = (Elo - points < 0) ? 0 : Elo - points;
-            statistic.addLosses();
+            statistic.AddLosses();
         }
 
         public void AddDraw()
         {
-            statistic.addDraw();
+            statistic.AddDraw();
         }
 
         public bool NoCardsLeft()

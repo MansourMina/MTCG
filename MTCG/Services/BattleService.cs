@@ -2,10 +2,10 @@
 
 namespace MTCG.Services
 {
-    public class BattleService
+    public class BattleService(User leftPlayer, User rightPlayer)
     {
-        public User LeftPlayer { get; private set; }
-        public User RightPlayer { get; private set; }
+        public User LeftPlayer { get; private set; } = leftPlayer;
+        public User RightPlayer { get; private set; } = rightPlayer;
         public int CurrentRound { get; private set; } = 1;
 
         private const int MaxRounds = 500;
@@ -28,15 +28,10 @@ namespace MTCG.Services
             RightPlayerLost,
             Playing
         }
-        public BattleService(User leftPlayer, User rightPlayer)
-        {
-            LeftPlayer = leftPlayer;
-            RightPlayer = rightPlayer;
-        }
 
-        public void start()
+        public void Start()
         {
-            Random rnd = new Random();
+            Random rnd = new();
             GameStatus gameStatus = GameStatus.Playing;
             while (CurrentRound <= MaxRounds && gameStatus == GameStatus.Playing)
             {
@@ -49,14 +44,14 @@ namespace MTCG.Services
                 int leftPlayerDamage = leftPlayerCard.Damage;
                 int rightPlayerDamage = rightPlayerCard.Damage;
 
-                if (_isSpellCard(leftPlayerCard) || _isSpellCard(rightPlayerCard))
+                if (IsSpellCard(leftPlayerCard) || IsSpellCard(rightPlayerCard))
                 {
-                    leftPlayerDamage = reCalcDamage(leftPlayerCard, rightPlayerCard);
-                    rightPlayerDamage = reCalcDamage(rightPlayerCard, leftPlayerCard);
+                    leftPlayerDamage = ReCalcDamage(leftPlayerCard, rightPlayerCard);
+                    rightPlayerDamage = ReCalcDamage(rightPlayerCard, leftPlayerCard);
                 }
-                printStatistics(CurrentRound);
-                updateGame(leftPlayerDamage, leftPlayerCard, rightPlayerDamage, rightPlayerCard);
-                gameStatus = checkGameOver();
+                PrintStatistics(CurrentRound);
+                UpdateGame(leftPlayerDamage, leftPlayerCard, rightPlayerDamage, rightPlayerCard);
+                gameStatus = CheckGameOver();
                 CurrentRound++;
             }
 
@@ -74,7 +69,7 @@ namespace MTCG.Services
 
         }
 
-        private void printStatistics(int round)
+        private void PrintStatistics(int round)
         {
             Console.WriteLine($"----------Round {round}----------");
             Console.WriteLine($"Left Player: {LeftPlayer.Elo}");
@@ -82,15 +77,15 @@ namespace MTCG.Services
             Console.WriteLine("\n");
         }
 
-        private bool _isSpellCard(Card card)
+        private static bool IsSpellCard(Card card)
         {
             return card.GetType().Name == CardType.SpellCard.ToString();
         }
 
-        private int reCalcDamage(Card leftPlayerCard, Card rightPlayerCard)
+        private static int ReCalcDamage(Card leftPlayerCard, Card rightPlayerCard)
         {
             int damage = leftPlayerCard.Damage;
-            switch (getEffectiveness(leftPlayerCard, rightPlayerCard))
+            switch (GetEffectiveness(leftPlayerCard, rightPlayerCard))
             {
                 case Effectiveness.isEffective:
                     damage *= 2;
@@ -102,7 +97,7 @@ namespace MTCG.Services
             }
             return damage;
         }
-        private Effectiveness getEffectiveness(Card leftPlayerCard, Card rightPlayerCard)
+        private static Effectiveness GetEffectiveness(Card leftPlayerCard, Card rightPlayerCard)
         {
             ElementType leftE = leftPlayerCard.ElementType;
             ElementType rightE = rightPlayerCard.ElementType;
@@ -123,21 +118,21 @@ namespace MTCG.Services
         }
 
 
-        private void updateGame(int leftPlayerDamage, Card leftPlayerCard, int rightPlayerDamage, Card rightPlayerCard)
+        private void UpdateGame(int leftPlayerDamage, Card leftPlayerCard, int rightPlayerDamage, Card rightPlayerCard)
         {
             if (leftPlayerDamage > rightPlayerDamage)
             {
                 LeftPlayer.AddWin(WinningPoints);
                 RightPlayer.AddLosses(LosingPoints);
                 LeftPlayer.Deck.addCard(rightPlayerCard);
-                removeCardFromPlayer(RightPlayer, rightPlayerCard);
+                RemoveCardFromPlayer(RightPlayer, rightPlayerCard);
             }
             else if (rightPlayerDamage < leftPlayerDamage)
             {
                 LeftPlayer.AddLosses(LosingPoints);
                 RightPlayer.AddWin(WinningPoints);
                 RightPlayer.Deck.addCard(leftPlayerCard);
-                removeCardFromPlayer(LeftPlayer, leftPlayerCard);
+                RemoveCardFromPlayer(LeftPlayer, leftPlayerCard);
             }
             else
             {
@@ -146,7 +141,7 @@ namespace MTCG.Services
             }
         }
 
-        private void removeCardFromPlayer(User player, Card card)
+        private static void RemoveCardFromPlayer(User player, Card card)
         {
             player.Deck.removeCard(card);
             Card? randomCard = player.Stack.popRandomCard();
@@ -154,7 +149,7 @@ namespace MTCG.Services
                 player.Deck.addCard(randomCard);
         }
 
-        public GameStatus checkGameOver()
+        public GameStatus CheckGameOver()
         {
             if (LeftPlayer.NoCardsLeft()) return GameStatus.LeftPlayerLost;
             if (RightPlayer.NoCardsLeft()) return GameStatus.RightPlayerLost;

@@ -1,17 +1,12 @@
 ﻿namespace MTCG.Services.HTTP
 {
-    public class HttpResponse
+    public class HttpResponse(StreamWriter writer)
     {
         public string Status { get; set; } = "200 OK";
         public string ContentType { get; set; } = "text/html";
         public string Body { get; set; } = "<html><body>Hello World! This is MIna.</body></html>";
 
-        public StreamWriter Writer { get; set; }
-
-        public HttpResponse(StreamWriter writer)
-        {
-            Writer = writer;
-        }
+        public StreamWriter Writer { get; set; } = writer;
 
         public void Send()
         {

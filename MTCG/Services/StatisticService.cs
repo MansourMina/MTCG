@@ -6,17 +6,17 @@
         public int Losses { get; private set; }
         public int Draws { get; private set; }
 
-        public void addWin()
+        public void AddWin()
         {
             Wins++;
         }
 
-        public void addLosses()
+        public void AddLosses()
         {
             Losses++;
         }
 
-        public void addDraw()
+        public void AddDraw()
         {
             Draws++;
         }

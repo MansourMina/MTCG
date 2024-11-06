@@ -4,32 +4,30 @@ namespace MTCG.Services.HTTP
 {
     public class HttpRequest
     {
-        public string Method { get; private set; }
-        public string Path { get; private set; }
-        public string Version { get; private set; }
+        public string? Method { get; private set; }
+        public string? Path { get; private set; }
+        public string? Version { get; private set; }
         public int Content_Length { get; private set; } = 0;
-        public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Headers { get; set; } = [];
         public StringBuilder Body { get; private set; } = new StringBuilder();
         public HttpRequest(StreamReader reader)
         {
             try
             {
-                readHttp(reader);
-                readHeader(reader);
-                readBody(reader);
-            }catch(InvalidDataException)
+                ReadHttp(reader);
+                ReadHeader(reader);
+                ReadBody(reader);
+            }
+            catch (InvalidDataException)
             {
                 throw;
             }
-            
+
         }
 
-        private void readHttp(StreamReader reader)
+        private void ReadHttp(StreamReader reader)
         {
-            string? line = reader.ReadLine();
-            if (line == null)
-                throw new InvalidDataException("The HTTP request is incomplete or invalid");
-
+            string? line = reader.ReadLine() ?? throw new InvalidDataException("The HTTP request is incomplete or invalid");
             var httpParts = line.Split(' ');
             if (httpParts.Length < 3)
                 throw new InvalidDataException("The HTTP request line is incomplete");
@@ -37,9 +35,9 @@ namespace MTCG.Services.HTTP
             Method = httpParts[0];
             Path = httpParts[1];
             Version = httpParts[2];
-         }
+        }
 
-        private void readHeader(StreamReader reader)
+        private void ReadHeader(StreamReader reader)
         {
             string? line;
             while ((line = reader.ReadLine()) != null)
@@ -53,13 +51,11 @@ namespace MTCG.Services.HTTP
                 var headerValue = headerParts[1].Trim();
                 Headers[headerName] = headerValue;
                 if (headerName == "Content-Length")
-                {
                     Content_Length = int.Parse(headerValue);
-                }
             }
         }
 
-        private void readBody(StreamReader reader)
+        private void ReadBody(StreamReader reader)
         {
             if (Content_Length > 0)
             {

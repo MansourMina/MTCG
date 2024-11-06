@@ -15,7 +15,7 @@ POST http://localhost:8000/sessions HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"Vamos",
+    "":"",
     "Password":"Test1"
 }
 

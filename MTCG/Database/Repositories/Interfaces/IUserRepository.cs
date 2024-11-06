@@ -1,6 +1,6 @@
 ﻿using MTCG.Models;
 
-namespace MTCG.Database.Repositories
+namespace MTCG.Database.Repositories.Interfaces
 {
     public interface IUserRepository
     {

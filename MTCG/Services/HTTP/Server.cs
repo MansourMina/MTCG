@@ -5,7 +5,7 @@ namespace MTCG.Services.HTTP
 {
     public class Server
     {
-        private TcpListener _server;
+        private readonly TcpListener _server;
         public IPAddress IpAddress { get; }
         public static int Port { get; private set; }
 
@@ -38,17 +38,17 @@ namespace MTCG.Services.HTTP
                 var client = _server.AcceptTcpClient();
                 using var reader = new StreamReader(client.GetStream());
                 using var writer = new StreamWriter(client.GetStream()) { AutoFlush = true };
-                HandleConnection(client, reader, writer);
+                HandleConnection(reader, writer);
             }
         }
 
-        private void HandleConnection(TcpClient client, StreamReader reader, StreamWriter writer)
+        private static void HandleConnection(StreamReader reader, StreamWriter writer)
         {
             try
             {
-                HttpRequest request = new HttpRequest(reader);
-                HttpResponse response = new HttpResponse(writer);
-                HttpHandler handler = new HttpHandler(request, response);
+                HttpRequest request = new (reader);
+                HttpResponse response = new (writer);
+                HttpHandler handler = new (request, response);
 
                 Console.WriteLine($"Response Status: {response.Status}");
             }

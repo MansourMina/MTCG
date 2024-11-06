@@ -8,7 +8,7 @@ namespace MTCG.Presentation
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             //       User leftPlayer = new User("Mina", "12344894");
             //       User rightPlayer = new User("Peter", "328190381");
@@ -121,14 +121,14 @@ namespace MTCG.Presentation
 
             // Start Server
 
-            startServer();
+            StartServer();
             
 
         }
 
-        static void startServer()
+        static void StartServer()
         {
-            Server server = new Server(IPAddress.Any);
+            Server server = new (IPAddress.Any);
             server.Start();
         }
     }
