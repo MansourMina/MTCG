@@ -27,14 +27,12 @@ namespace MTCG.Models
             }
         }
 
-        public void Set(List<Card> cards)
-        {
-            int deckSpace = Cards.Capacity - Cards.Count;
-            for (int card = 0; card < deckSpace && card < cards.Count; card++)
-                addCard(cards[card]);
-        }
+        
+
         public void removeCard(Card card)
         {
+            if (card == null) 
+                return;
             Cards.Remove(card);
         }
 

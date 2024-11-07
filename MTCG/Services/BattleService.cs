@@ -8,7 +8,7 @@ namespace MTCG.Services
         public User RightPlayer { get; private set; } = rightPlayer;
         public int CurrentRound { get; private set; } = 1;
 
-        private const int MaxRounds = 500;
+        private const int MaxRounds = 100;
 
         public const int WinningPoints = 3;
 
@@ -35,6 +35,11 @@ namespace MTCG.Services
             GameStatus gameStatus = GameStatus.Playing;
             while (CurrentRound <= MaxRounds && gameStatus == GameStatus.Playing)
             {
+                PrintStatistics(CurrentRound);
+                
+                gameStatus = CheckGameOver();
+                if (gameStatus != GameStatus.Playing) break;
+
                 var leftPlayerCards = LeftPlayer.Deck.Cards;
                 var rightPlayerCards = RightPlayer.Deck.Cards;
 
@@ -49,9 +54,7 @@ namespace MTCG.Services
                     leftPlayerDamage = ReCalcDamage(leftPlayerCard, rightPlayerCard);
                     rightPlayerDamage = ReCalcDamage(rightPlayerCard, leftPlayerCard);
                 }
-                PrintStatistics(CurrentRound);
                 UpdateGame(leftPlayerDamage, leftPlayerCard, rightPlayerDamage, rightPlayerCard);
-                gameStatus = CheckGameOver();
                 CurrentRound++;
             }
 
@@ -62,9 +65,11 @@ namespace MTCG.Services
             else
             {
                 Console.WriteLine($"{(RightPlayer.statistic.Wins > LeftPlayer.statistic.Wins ? "Right" : "Left")} WON");
-                Console.WriteLine(LeftPlayer.Stack.Cards.Count);
-                Console.WriteLine(RightPlayer.Stack.Cards.Count);
             }
+            Console.WriteLine("Left Player Deck: " + LeftPlayer.Deck.Cards.Count);
+            Console.WriteLine("Left Player Stack: " + LeftPlayer.Stack.Cards.Count);
+            Console.WriteLine("Right Player Deck: " + RightPlayer.Deck.Cards.Count);
+            Console.WriteLine("Right Player Stack: " + RightPlayer.Stack.Cards.Count);
 
 
         }
@@ -127,10 +132,10 @@ namespace MTCG.Services
                 LeftPlayer.Deck.addCard(rightPlayerCard);
                 RemoveCardFromPlayer(RightPlayer, rightPlayerCard);
             }
-            else if (rightPlayerDamage < leftPlayerDamage)
+            else if (leftPlayerDamage < rightPlayerDamage)
             {
-                LeftPlayer.AddLosses(LosingPoints);
                 RightPlayer.AddWin(WinningPoints);
+                LeftPlayer.AddLosses(LosingPoints);
                 RightPlayer.Deck.addCard(leftPlayerCard);
                 RemoveCardFromPlayer(LeftPlayer, leftPlayerCard);
             }

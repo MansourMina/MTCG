@@ -36,9 +36,12 @@
             //}
             //removeCard(highestCard);
             //return highestCard;
+            if(Cards.Count == 0) return null;
 
             Random rnd = new Random();
-            return Cards[rnd.Next(Cards.Count)];
+            var card = Cards[rnd.Next(Cards.Count)];
+            Cards.Remove(card);
+            return card;
         }
 
     }

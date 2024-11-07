@@ -1,8 +1,6 @@
 ﻿using MTCG.Database.Repositories.Interfaces;
 using MTCG.Models;
 using MTCG.Services;
-using MTCG.Services.Interfaces;
-using Newtonsoft.Json.Linq;
 using NSubstitute;
 
 namespace MTCGTest.Services
@@ -11,6 +9,11 @@ namespace MTCGTest.Services
     {
         private LoginService _loginService;
         private IUserRepository _mockedUserRepository;
+
+        private User CreateUser(string username, string password)
+        {
+            return new User(username, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
+        }
 
         [SetUp]
         public void Setup()
@@ -25,8 +28,9 @@ namespace MTCGTest.Services
             // Arrange
             string username = "testUser";
             string password = "testPassword";
+            var user = CreateUser(username, password);
 
-            _mockedUserRepository.Get(username).Returns(new User(username, BCrypt.Net.BCrypt.EnhancedHashPassword(password)));
+            _mockedUserRepository.Get(username).Returns(user);
 
             // Act
             string token = _loginService.Login(username, password);
@@ -45,8 +49,8 @@ namespace MTCGTest.Services
             string username = "testUser";
             string password = "testPassword";
             string wrongPassword = "Wrong";
-
-            _mockedUserRepository.Get(username).Returns(new User(username, BCrypt.Net.BCrypt.EnhancedHashPassword(password)));
+            var user = CreateUser(username, password);
+            _mockedUserRepository.Get(username).Returns(user);
 
             // Act & Assert
             var exception = Assert.Throws<UnauthorizedAccessException>(() => _loginService.Login(username, wrongPassword));
@@ -59,7 +63,7 @@ namespace MTCGTest.Services
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            var user = new User(username, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
+            var user = CreateUser(username, password);
 
             _mockedUserRepository.Get(username).Returns(user);
 
@@ -77,7 +81,7 @@ namespace MTCGTest.Services
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            var user = new User(username, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
+            var user = CreateUser(username, password);
 
             _mockedUserRepository.Get(username).Returns(user);
 
@@ -94,7 +98,7 @@ namespace MTCGTest.Services
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            var user = new User(username, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
+            var user = CreateUser(username, password);
 
             _mockedUserRepository.Get(username).Returns(user);
 
@@ -113,8 +117,8 @@ namespace MTCGTest.Services
         public void GetSessionToken_ShouldReturnCorrectToken_ForMultipleUsers()
         {
             // Arrange
-            var user1 = new User("user1", BCrypt.Net.BCrypt.EnhancedHashPassword("password1"));
-            var user2 = new User("user2", BCrypt.Net.BCrypt.EnhancedHashPassword("password2"));
+            var user1 = CreateUser("user1", "password1");
+            var user2 = CreateUser("user2", "password2");
 
             _mockedUserRepository.Get("user1").Returns(user1);
             _mockedUserRepository.Get("user2").Returns(user2);

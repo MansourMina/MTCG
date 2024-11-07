@@ -1,4 +1,5 @@
-﻿using MTCG.Services;
+﻿using MTCG.Models;
+using MTCG.Services;
 using MTCG.Services.HTTP;
 using System;
 using System.Collections;
@@ -10,84 +11,73 @@ namespace MTCG.Presentation
     {
         static void Main()
         {
-            //       User leftPlayer = new User("Mina", "12344894");
-            //       User rightPlayer = new User("Peter", "328190381");
-            //;
-            //       leftPlayer.Stack.Set(new List<Card>{
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1",40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire)
+            User leftPlayer = new User("Mina", "12344894");
+            User rightPlayer = new User("Peter", "328190381");
+            leftPlayer.Stack.Set(new List<Card>{
+                       new SpellCard("Spelly1", 90, ElementType.Normal),
+                       new MonsterCard("Monsti1",40, ElementType.Fire),
+                       new SpellCard("Spelly2", 180, ElementType.Water),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly2", 200, ElementType.Water),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new SpellCard("Spelly2", 3213, ElementType.Water),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new SpellCard("Spelly2", 200, ElementType.Water),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new SpellCard("Spelly2", 200, ElementType.Water),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new SpellCard("Spelly2", 200, ElementType.Water),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire)
 
 
-            //       });
+                   });
 
-            //       leftPlayer.Deck.Set(new List<Card>{
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1",40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire)
-            //       });
+            leftPlayer.SetDeck();
 
 
 
-            //       rightPlayer.Stack.Set(new List<Card>{
-            //           new SpellCard("Speller1", 70, ElementType.Water),
-            //           new MonsterCard("Monster1", 80, ElementType.Water),
-            //           new SpellCard("Speller2", 100, ElementType.Water),
-            //           new MonsterCard("Monser2", 98, ElementType.Water),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire),
-            //           new SpellCard("Spelly1", 90, ElementType.Normal),
-            //           new MonsterCard("Monsti1", 40, ElementType.Fire),
-            //           new SpellCard("Spelly2", 200, ElementType.Water),
-            //           new MonsterCard("Monsti2", 20, ElementType.Fire)
+            rightPlayer.Stack.Set(new List<Card>{
+                       new SpellCard("Speller1", 70, ElementType.Water),
+                       new MonsterCard("Monster1", 80, ElementType.Water),
+                       new SpellCard("Speller2", 100, ElementType.Water),
+                       //new MonsterCard("Monser2", 98, ElementType.Water),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new SpellCard("Spelly2", 183, ElementType.Water),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly2", 200, ElementType.Water),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly2", 232, ElementType.Water),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly2", 111, ElementType.Water),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire),
+                       //new SpellCard("Spelly1", 90, ElementType.Normal),
+                       //new MonsterCard("Monsti1", 40, ElementType.Fire),
+                       //new SpellCard("Spelly2", 32, ElementType.Water),
+                       //new MonsterCard("Monsti2", 20, ElementType.Fire)
 
-            //       });
-            //       rightPlayer.Deck.Set(new List<Card>{
-            //           new SpellCard("Speller1", 70, ElementType.Water),
-            //           new MonsterCard("Monster1", 80, ElementType.Water),
-            //           new SpellCard("Speller2", 100, ElementType.Normal),
-            //           new MonsterCard("Monser2", 98, ElementType.Water)
-            //       });
+                   });
+            rightPlayer.SetDeck();
 
-            //       Battle battle = new Battle(leftPlayer, rightPlayer); 
-            //       battle.start();
+            BattleService battle = new(leftPlayer, rightPlayer);
+            battle.Start();
 
             //Test Data
             //List<Tuple<string, string>> Users = new List<Tuple<string, string>>
@@ -119,10 +109,9 @@ namespace MTCG.Presentation
             //foreach (var user in Users)
             //registerService.Register(user.Item1, user.Item2);
 
-            // Start Server
 
-            StartServer();
-            
+            //StartServer();
+
 
         }
 

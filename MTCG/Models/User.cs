@@ -98,5 +98,16 @@ namespace MTCG.Models
         {
             Deck.Cards.Add(card);
         }
+
+        public void SetDeck()
+        {
+            Stack.Cards.Sort((x, y) => y.Damage.CompareTo(x.Damage));
+            int length = Deck.Cards.Capacity - Deck.Cards.Count;
+            for (int i = 0; i < length && i < Stack.Cards.Count; i++)
+            {
+                Deck.Cards.Add(Stack.Cards[i]);
+                Stack.Cards.Remove(Stack.Cards[i]);
+            }
+        }
     }
 }
