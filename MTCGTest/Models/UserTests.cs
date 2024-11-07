@@ -1,6 +1,6 @@
 using MTCG.Models;
 
-namespace MTCGTest.Repositories
+namespace MTCGTest.Models
 {
     public class UserTests
     {
@@ -12,6 +12,35 @@ namespace MTCGTest.Repositories
 
         }
 
+
+        [Test]
+        public void Constructor_ShouldInitializeProperties_WhenValidArgumentsProvided()
+        {
+            // Arrange
+            string name = "testUser";
+            string password = "testPassword";
+            var stack = new Stack();
+
+            // Act
+            var user = new User(name, password, stack);
+
+            // Assert
+            Assert.That(user.Username, Is.EqualTo(name));
+            Assert.That(user.Password, Is.EqualTo(password));
+            Assert.That(user.Stack, Is.EqualTo(stack));
+        }
+
+        [Test]
+        public void PrivateConstructor_ShouldInitializeUser()
+        {
+            // Act
+            var user = (User)Activator.CreateInstance(typeof(User), true);
+
+            // Assert
+            Assert.That(user, Is.Not.Null);
+
+        }
+
         [Test]
         public void User_Initialization_ShouldSetUsernameAndPassword()
         {
@@ -20,7 +49,7 @@ namespace MTCGTest.Repositories
             string password = "testPassword";
 
             // Act
-            User user = new User(username, password);
+            User user = new(username, password);
 
             // Assert
             Assert.That(user.Username, Is.EqualTo(username));
@@ -35,7 +64,7 @@ namespace MTCGTest.Repositories
             string password = "testPassword";
 
             // Act
-            User user = new User(username, password);
+            User user = new(username, password);
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(100));
@@ -49,7 +78,7 @@ namespace MTCGTest.Repositories
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            User user = new User(username, password);
+            User user = new(username, password);
             int elo = 100;
             int coins = 200;
 
@@ -69,7 +98,7 @@ namespace MTCGTest.Repositories
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            User user = new User(username, password);
+            User user = new(username, password);
             user.SetElo(100);
             int pointsToAdd = 10;
 
@@ -88,7 +117,7 @@ namespace MTCGTest.Repositories
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            User user = new User(username, password);
+            User user = new(username, password);
             user.SetElo(10);
             int pointsToRemove = 5;
 
@@ -107,7 +136,7 @@ namespace MTCGTest.Repositories
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            User user = new User(username, password);
+            User user = new(username, password);
             user.SetElo(5);
             int pointsToRemove = 10;
 
@@ -126,7 +155,7 @@ namespace MTCGTest.Repositories
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            User user = new User(username, password);
+            User user = new(username, password);
 
             // Act
             user.AddDraw();
@@ -137,12 +166,12 @@ namespace MTCGTest.Repositories
 
 
         [Test]
-        public void ChangePassword_ShouldUpdatePassword_WhenPasswordIsHashed()
+        public void ChangePassword_ShouldUpdatePassword()
         {
             // Arrange
             string username = "testUser";
             string password = "$2a$12$hashedpassword";
-            User user = new User(username, password);
+            User user = new(username, password);
             string newPassword = "$2a$12$newhashedpassword";
 
             // Act
@@ -152,5 +181,84 @@ namespace MTCGTest.Repositories
             Assert.That(user.Password, Is.EqualTo(newPassword));
         }
 
+        [Test]
+        public void ChangeUsername_ShouldUpdateUsername()
+        {
+            // Arrange
+            string username = "testUser";
+            string password = "$2a$12$hashedpassword";
+            User user = new(username, password);
+            string newUsername = "testUser2";
+
+            // Act
+            user.ChangeUsername(newUsername);
+
+            // Assert
+            Assert.That(user.Username, Is.EqualTo(newUsername));
+        }
+
+        [Test]
+        public void NoCardsLeft_ShouldReturnTrue_WhenCardsCountIsZero()
+        {
+            // Arrange
+            string username = "testUser";
+            string password = "$2a$12$hashedpassword";
+            User user = new(username, password);
+
+            // Act
+            bool noCards = user.NoCardsLeft();
+
+            // Assert
+            Assert.IsTrue(noCards);
+        }
+
+        [Test]
+        public void NoCardsLeft_ShouldReturnFalse_WhenCardsCountIsNotZero()
+        {
+            // Arrange
+            string username = "testUser";
+            string password = "$2a$12$hashedpassword";
+            User user = new(username, password);
+            user.AddCardToDeck(new MonsterCard("TestMonster", 100, ElementType.Normal));
+
+            // Act
+            bool noCards = user.NoCardsLeft();
+
+            // Assert
+            Assert.That(noCards, Is.False);
+        }
+
+
+        [Test]
+        public void SetToken_ShouldSetToken_WhenTokenIsValidGuid()
+        {
+            // Arrange
+            string username = "testUser";
+            string password = "$2a$12$hashedpassword";
+            User user = new(username, password);
+            var validToken = Guid.NewGuid().ToString();
+
+            // Act
+            user.SetToken(validToken);
+
+            // Assert
+            Assert.That(user.Token, Is.EqualTo(validToken));
+        }
+
+        [Test]
+        public void SetToken_ShouldNotSetToken_WhenTokenIsInvalidGuid()
+        {
+            // Arrange
+            string username = "testUser";
+            string password = "$2a$12$hashedpassword";
+            User user = new(username, password);
+            var invalidToken = "InvalidToken123";
+
+            // Act
+            user.SetToken(invalidToken);
+
+            // Assert
+            Assert.That(user.Token, Is.Not.EqualTo(invalidToken));
+        }
     }
 }

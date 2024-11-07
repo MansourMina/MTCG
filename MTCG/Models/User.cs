@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using MTCG.Services;
 
 namespace MTCG.Models
@@ -23,6 +22,7 @@ namespace MTCG.Models
 
         [JsonConstructor]
         private User() { }
+
         public User(string name, string password)
         {
             _setProperties(name, password);
@@ -89,9 +89,14 @@ namespace MTCG.Models
             Password = password;
         }
 
-        internal void ChangeUsername(string username)
+        public void ChangeUsername(string username)
         {
             Username = username;
+        }
+
+        public void AddCardToDeck(Card card)
+        {
+            Deck.Cards.Add(card);
         }
     }
 }

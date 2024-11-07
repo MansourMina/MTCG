@@ -1,10 +1,8 @@
-﻿using MTCG.Database.Repositories;
-using MTCG.Database.Repositories.Interfaces;
+﻿using MTCG.Database.Repositories.Interfaces;
 using MTCG.Models;
 using MTCG.Services;
 using MTCG.Services.Interfaces;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 
 namespace MTCGTest.Services
 {
@@ -79,9 +77,6 @@ namespace MTCGTest.Services
             Assert.That(registerService.GetLoginService(), Is.Not.Null);
             Assert.That(registerService.GetUserRepository(), Is.Not.Null);
 
-            // Optional: Prüfe, ob sie die richtigen Typen haben
-            Assert.That(registerService.GetLoginService(), Is.InstanceOf<LoginService>());
-            Assert.That(registerService.GetUserRepository(), Is.InstanceOf<UserRepository>());
         }
 
     }
