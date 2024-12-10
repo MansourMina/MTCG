@@ -2,7 +2,7 @@
 {
     public class Dragon : MonsterCard
     {
-        public Dragon(int damage) : base(typeof(Dragon).ToString(), damage, ElementType.Fire)
+        public Dragon(int damage, string id) : base(typeof(Dragon).ToString(), damage, ElementType.Fire, id)
         {
 
         }

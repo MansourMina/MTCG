@@ -2,7 +2,7 @@
 {
     public class Goblin : MonsterCard
     {
-        public Goblin(int damage) : base(typeof(Goblin).ToString(), damage, ElementType.Normal)
+        public Goblin(int damage, string id) : base(typeof(Goblin).ToString(), damage, ElementType.Normal, id)
         {
 
         }

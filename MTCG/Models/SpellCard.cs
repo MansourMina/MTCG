@@ -2,7 +2,7 @@
 {
     public class SpellCard : Card
     {
-        public SpellCard(string name, int damage, ElementType elementType) : base(name, damage, elementType)
+        public SpellCard(string name, int damage, ElementType elementType, string id) : base(name, damage, elementType, id)
         {
 
         }

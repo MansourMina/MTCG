@@ -15,6 +15,7 @@ namespace MTCG.Services
         public const int LosingPoints = 3;
 
         public const int DeckSize = 4;
+
         enum Effectiveness
         {
             isEffective,

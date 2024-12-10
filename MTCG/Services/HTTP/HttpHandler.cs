@@ -49,6 +49,7 @@ namespace MTCG.Services.HTTP
             Routes[Tuple.Create("/users", "GET")] = GetUser;
             Routes[Tuple.Create("/users", "DELETE")] = DeleteUser;
             Routes[Tuple.Create("/users", "PATCH")] = UpdateUser;
+            Routes[Tuple.Create("/packages", "POST")] = CreatePackage;
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -145,6 +146,14 @@ namespace MTCG.Services.HTTP
             if (rowsAffected == 0)
                 throw new KeyNotFoundException($"User '{username}' does not exist");
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = "User deleted successfully" };
+        }
+
+        private ResponseFormat CreatePackage(HttpRequest request)
+        {
+            var dCards = JsonSerializer.Deserialize<List<Card>>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to create package");
+            PackageService packageService = new();
+            packageService.Add(new Package(dCards, Guid.NewGuid().ToString()));
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package created successfully" };
         }
 
         private ResponseFormat UpdateUser(HttpRequest request)

@@ -11,12 +11,12 @@ namespace MTCG.Presentation
     {
         static void Main()
         {
-            User leftPlayer = new User("Mina", "12344894");
-            User rightPlayer = new User("Peter", "328190381");
-            leftPlayer.Stack.Set(new List<Card>{
-                       new SpellCard("Spelly1", 90, ElementType.Normal),
-                       new MonsterCard("Monsti1",40, ElementType.Fire),
-                       new SpellCard("Spelly2", 180, ElementType.Water),
+            //User leftPlayer = new User("Mina", "12344894");
+            //User rightPlayer = new User("Peter", "328190381");
+            //leftPlayer.Stack.Set(new List<Card>{
+            //           new SpellCard("Spelly1", 90, ElementType.Normal),
+            //           new MonsterCard("Monsti1",40, ElementType.Fire),
+            //           new SpellCard("Spelly2", 180, ElementType.Water),
                        //new MonsterCard("Monsti2", 20, ElementType.Fire),
                        //new SpellCard("Spelly1", 90, ElementType.Normal),
                        //new MonsterCard("Monsti1", 40, ElementType.Fire),
@@ -40,16 +40,16 @@ namespace MTCG.Presentation
                        //new MonsterCard("Monsti2", 20, ElementType.Fire)
 
 
-                   });
+            //       });
 
-            leftPlayer.SetDeck();
+            //leftPlayer.SetDeck();
 
 
 
-            rightPlayer.Stack.Set(new List<Card>{
-                       new SpellCard("Speller1", 70, ElementType.Water),
-                       new MonsterCard("Monster1", 80, ElementType.Water),
-                       new SpellCard("Speller2", 100, ElementType.Water),
+            //rightPlayer.Stack.Set(new List<Card>{
+            //           new SpellCard("Speller1", 70, ElementType.Water),
+            //           new MonsterCard("Monster1", 80, ElementType.Water),
+            //           new SpellCard("Speller2", 100, ElementType.Water),
                        //new MonsterCard("Monser2", 98, ElementType.Water),
                        //new MonsterCard("Monsti1", 40, ElementType.Fire),
                        //new MonsterCard("Monsti2", 20, ElementType.Fire),
@@ -73,11 +73,11 @@ namespace MTCG.Presentation
                        //new SpellCard("Spelly2", 32, ElementType.Water),
                        //new MonsterCard("Monsti2", 20, ElementType.Fire)
 
-                   });
-            rightPlayer.SetDeck();
+            //       });
+            //rightPlayer.SetDeck();
 
-            BattleService battle = new(leftPlayer, rightPlayer);
-            battle.Start();
+            //BattleService battle = new(leftPlayer, rightPlayer);
+            //battle.Start();
 
             //Test Data
             //List<Tuple<string, string>> Users = new List<Tuple<string, string>>
@@ -110,7 +110,7 @@ namespace MTCG.Presentation
             //registerService.Register(user.Item1, user.Item2);
 
 
-            //StartServer();
+            StartServer();
 
 
         }
