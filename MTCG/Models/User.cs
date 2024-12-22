@@ -6,7 +6,8 @@ namespace MTCG.Models
 
     public class User
     {
-       
+        [JsonInclude]
+        public string Role { get; private set; }
         [JsonInclude]
         public string Username { get; private set; }
         [JsonInclude]
@@ -26,6 +27,11 @@ namespace MTCG.Models
         public User(string name, string password)
         {
             _setProperties(name, password);
+        }
+        public User(string name, string password, string role)
+        {
+            _setProperties(name, password);
+            Role = role;
         }
 
         public User(string name, string password, Stack stack)

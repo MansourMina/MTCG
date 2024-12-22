@@ -1,4 +1,6 @@
-﻿namespace MTCG.Models
+﻿using System.Text.Json.Serialization;
+
+namespace MTCG.Models
 {
     public enum ElementType
     {
@@ -12,11 +14,14 @@
         SpellCard,
         MonsterCard
     }
-    public abstract class Card
+    public class Card
     {
-        public string Id { get; }
+        [JsonInclude]
+        public string Id { get; private set; }
+        [JsonInclude]
         public string Name { get; protected set; }
-        public int Damage { get; }
+        [JsonInclude]
+        public int Damage { get; private set; }
 
         public ElementType ElementType { get; }
 
@@ -27,5 +32,8 @@
             ElementType = elementType;
             Id = id;
         }
+
+        [JsonConstructor]
+        private Card() { }
     }
 }

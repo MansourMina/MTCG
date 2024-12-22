@@ -12,14 +12,15 @@ namespace MTCG.Database.Repositories
         public void Add(User user)
         {
             var commandText = """
-                INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id)
-                VALUES (@username, @password, @coins, @elo, NULL, NULL, NULL)
+                INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id, role)
+                VALUES (@username, @password, @coins, @elo, NULL, NULL, NULL, @role)
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, user.Username);
             DataLayer.AddParameterWithValue(command, "@password", DbType.String, user.Password);
             DataLayer.AddParameterWithValue(command, "@coins", DbType.Int32, user.Coins);
             DataLayer.AddParameterWithValue(command, "@elo", DbType.Int32, user.Elo);
+            DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
             //person.Id = (int)(dbCommand.ExecuteScalar() ?? 0);
             command.ExecuteNonQuery();
         }
@@ -27,7 +28,7 @@ namespace MTCG.Database.Repositories
         public List<User> GetAll()
         {
             var commandText = """
-            SELECT username, password, coins, elo 
+            SELECT username, password, role, coins, elo
             FROM users
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -36,9 +37,9 @@ namespace MTCG.Database.Repositories
             using IDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var user = new User(reader.GetString(0), reader.GetString(1));
-                user.SetCoins(reader.GetInt32(2));
-                user.SetElo(reader.GetInt32(3));
+                var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
+                user.SetCoins(reader.GetInt32(3));
+                user.SetElo(reader.GetInt32(4));
                 result.Add(user);
             }
             return result;
@@ -46,16 +47,16 @@ namespace MTCG.Database.Repositories
 
         public User? Get(string username)
         {
-            var commandText = """SELECT username, password, coins, elo from users where username = @username""";
+            var commandText = """SELECT username, password, role, coins, elo  from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username.Trim());
 
             using IDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                var user = new User(reader.GetString(0), reader.GetString(1));
-                user.SetCoins(reader.GetInt32(2));
-                user.SetElo(reader.GetInt32(3));
+                var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
+                user.SetCoins(reader.GetInt32(3));
+                user.SetElo(reader.GetInt32(4));
                 return user;
             }
 
@@ -67,7 +68,7 @@ namespace MTCG.Database.Repositories
 
             var commandText = """
             UPDATE users 
-            SET username = @newUsername, elo = @elo, coins = @coins, password = @password
+            SET username = @newUsername, elo = @elo, coins = @coins, password = @password, role = @role
             WHERE username = @username
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -76,6 +77,7 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@password", DbType.String, user.Password);
             DataLayer.AddParameterWithValue(command, "@newUsername", DbType.String, user.Username);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username);
+            DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
             command.ExecuteNonQuery();
         }
 

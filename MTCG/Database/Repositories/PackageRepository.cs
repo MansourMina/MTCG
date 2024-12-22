@@ -18,11 +18,54 @@ namespace MTCG.Database.Repositories
             string package_id = AddPackage(package);
             foreach (var card in package.Cards)
             {
-                string card_id = AddCard(card);
+                string card_id = card.Id;
+                if (!CardExists(card.Id))
+                    card_id = AddCard(card);
                 AddJointTable(card_id, package_id);
             }
         }
 
+        public List<Card> GetAll()
+        {
+            var commandText = """
+            SELECT c.name as card_name, c.damage as damage, c.id as card_id, p.id as package_id 
+            from cards as c 
+            JOIN packages_cards as pc ON c.id = pc.card_id 
+            JOIN packages as p ON p.id = pc.package_id 
+            """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+
+            List<Card> result = [];
+            using IDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                var card = new Card(reader.GetString(0), reader.GetInt32(1), ElementType.Water, reader.GetString(2));
+                result.Add(card);
+            }
+            return result;
+        }
+
+        public Card? Get(string id)
+        {
+            var commandText = """
+                SELECT c.name as card_name, c.damage as damage, c.id as card_id, p.id as package_id 
+                from cards as c 
+                JOIN packages_cards as pc ON c.id = pc.card_id 
+                JOIN packages as p ON p.id = pc.package_id 
+                WHERE c.id = @id
+                """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@id", DbType.String, id.Trim());
+
+            using IDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                var card = new Card(reader.GetString(0), reader.GetInt32(1), ElementType.Water, reader.GetString(2));
+                return card;
+            }
+
+            return null;
+        }
         private string AddPackage(Package package)
         {
             var commandText = """
@@ -60,5 +103,20 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@card_id", DbType.String, card_id);
             command.ExecuteNonQuery();
         }
+
+        private bool CardExists(string id)
+        {
+            var commandText = """
+                SELECT COUNT(*) 
+                FROM cards 
+                WHERE id = @id
+            """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@id", DbType.String, id);
+            var result = command.ExecuteScalar();
+            return Convert.ToInt32(result) > 0;
+        }
+
+
     }
 }

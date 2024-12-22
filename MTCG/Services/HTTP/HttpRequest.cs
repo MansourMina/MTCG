@@ -10,6 +10,7 @@ namespace MTCG.Services.HTTP
         public int Content_Length { get; private set; } = 0;
         public Dictionary<string, string> Headers { get; set; } = [];
         public StringBuilder Body { get; private set; } = new StringBuilder();
+        public string? Authorization { get; private set; }
         public HttpRequest(StreamReader reader)
         {
             try
@@ -52,6 +53,8 @@ namespace MTCG.Services.HTTP
                 Headers[headerName] = headerValue;
                 if (headerName == "Content-Length")
                     Content_Length = int.Parse(headerValue);
+                if (headerName == "Authorization")
+                    Authorization = headerValue;
             }
         }
 

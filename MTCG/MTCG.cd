@@ -52,14 +52,14 @@
   <Class Name="MTCG.Models.Card">
     <Position X="3.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAABACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAACBACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.Deck">
     <Position X="8.25" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAAAAAAIAAAAAAQAAAAAAAAAACA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAQAAAAAAAAAACA=</HashCode>
       <FileName>Models\Deck.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -94,33 +94,14 @@
   <Class Name="MTCG.Models.User">
     <Position X="6.5" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAQAIAoAAAAAQAECAAEoAAAAAACAIBIAAABAAA=</HashCode>
+      <HashCode>ABAAgCgAAgAAgAQAAwAECAAAoAIABAACEAhIAAABAAA=</HashCode>
       <FileName>Models\User.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Services.HTTP.HttpHandler">
-    <Position X="14.75" Y="3.5" Width="1.5" />
-    <NestedTypes>
-      <Enum Name="MTCG.Services.HTTP.HttpHandler.HTTPStatusCode" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Services\HTTP\HttpHandler.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-      <Struct Name="MTCG.Services.HTTP.HttpHandler.ResponseFormat" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Services\HTTP\HttpHandler.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
-    <TypeIdentifier>
-      <HashCode>EAAAABAAAAAAABAAAEAAAAAAIAAAAAIAAAAAAAAAAAA=</HashCode>
-      <FileName>Services\HTTP\HttpHandler.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Services.HTTP.HttpRequest">
     <Position X="16.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>MAAAQAAAAAAAAAIAAAAhAAAACAAAAAAAIAAAAAIAAAA=</HashCode>
+      <HashCode>IAAAABAAAEAAAAIAIAAhAAAACAAAAAAAIgAAAAAAAAA=</HashCode>
       <FileName>Services\HTTP\HttpRequest.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -153,29 +134,50 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EAAAAgICAAAAAAAwAAAICAAAAEAAAUAAAEAAACAAAEA=</HashCode>
+      <HashCode>AAAIAgIAADAAAkAAEAAICCAAAEAAAQAEAAAAAAAAAEA=</HashCode>
       <FileName>Services\BattleService.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Services.LoginService">
     <Position X="15.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAEAAAAAAAAAAAAEAAIAAAQAAAAAAAAQAAAAAgA=</HashCode>
+      <HashCode>AAAAAAEgAAAAAAAAAAEEAAIAAAQAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Services\LoginService.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="MTCG.Services.PackageService" Collapsed="true">
     <Position X="11.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAACAAAAAAAACAAAAAAAA=</HashCode>
       <FileName>Services\PackageService.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Services.RegisterService">
     <Position X="14" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAgAAAAAAAIgAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Services\RegisterService.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="MTCG.Services.HTTP.HttpHandler">
+    <Position X="14.75" Y="3.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="MTCG.Services.HTTP.HttpHandler.HTTPStatusCode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Services\HTTP\HttpHandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="MTCG.Services.HTTP.HttpHandler.ResponseFormat" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Services\HTTP\HttpHandler.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>EAAAABAAAEAAABgEAEAAAAACCQAAACIAEAAACAABAAA=</HashCode>
+      <FileName>Services\HTTP\HttpHandler.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Enum Name="MTCG.Models.ElementType">

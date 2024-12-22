@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Data;
 using System.IO;
+using System.Net;
 using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Web;
@@ -50,6 +51,7 @@ namespace MTCG.Services.HTTP
             Routes[Tuple.Create("/users", "DELETE")] = DeleteUser;
             Routes[Tuple.Create("/users", "PATCH")] = UpdateUser;
             Routes[Tuple.Create("/packages", "POST")] = CreatePackage;
+            Routes[Tuple.Create("/packages", "GET")] = GetPackages;
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -57,7 +59,6 @@ namespace MTCG.Services.HTTP
             Console.WriteLine("-------------------------------------------");
             string path = GetMainRoute(request.Path ?? string.Empty);
             var clientRequest = Tuple.Create(path, request.Method);
-
             Console.WriteLine(request.Method + " " + request.Path);
 
             var finalResponse = new ResponseFormat { Status = (int)HTTPStatusCode.NotFound, Body = "Path Not found" };
@@ -66,6 +67,7 @@ namespace MTCG.Services.HTTP
             {
                 try
                 {
+                    IsAdmin(request.Authorization);
                     var responseFormat = Routes[clientRequest](request);
                     finalResponse.Status = responseFormat.Status;
                     finalResponse.Body = responseFormat.Body;
@@ -99,11 +101,31 @@ namespace MTCG.Services.HTTP
             SendResponse(response, finalResponse.Status, finalResponse.Body);
         }
 
+        public bool IsAuthorized(string authorization)
+        {
+            if (string.IsNullOrEmpty(authorization))
+                return true;
+
+            var parts = authorization.Split(' ');
+            if (parts.Length != 2) return false;
+            var properties = parts[1].Split('-');
+            string role = properties[0];
+            string sessionToken = properties[1];
+            UserRepository dbUser = new();
+            User? user = dbUser.Get(sessionToken) ?? null;
+            if (parts.Length == 2 && parts[0] == "Bearer" && parts[1] == "admin-mtcgToken")
+            {
+                return true;  // Benutzer ist Admin
+            }
+
+            return false;  // Benutzer ist nicht Admin
+        }
+
         private ResponseFormat RegisterUser(HttpRequest request)
         {
             RegisterService registerService = new();
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to register user");
-            registerService.Register(dUser.Username, dUser.Password);
+            registerService.Register(dUser.Username, dUser.Password, dUser.Role);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
 
@@ -150,10 +172,28 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat CreatePackage(HttpRequest request)
         {
-            var dCards = JsonSerializer.Deserialize<List<Card>>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to create package");
+            var dPackage = JsonSerializer.Deserialize<List<Card>>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to create package");
             PackageService packageService = new();
-            packageService.Add(new Package(dCards, Guid.NewGuid().ToString()));
+            packageService.Add(new Package(dPackage, Guid.NewGuid().ToString()));
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package created successfully" };
+        }
+
+        private ResponseFormat GetPackages(HttpRequest request)
+        {
+            PackageRepository dbPackage = new();
+            ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
+            string? query = ExtractQuery(request.Path ?? string.Empty, "Id");
+            if (query != null)
+            {
+                Card? package = dbPackage.Get(query) ?? throw new KeyNotFoundException($"Package '{query}' does not exist");
+                response.Body = JsonSerializer.Serialize(package);
+            }
+            else
+            {
+                var packages = dbPackage.GetAll();
+                response.Body = JsonSerializer.Serialize(packages);
+            }
+            return response;
         }
 
         private ResponseFormat UpdateUser(HttpRequest request)
