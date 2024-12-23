@@ -182,7 +182,7 @@ namespace MTCG.Services.HTTP
                 return false;
 
             var sessionService = new SessionService();
-            string? userId = sessionService.GetUserId(token);
+            string? userId = sessionService.GetUserIdByToken(token);
             if (string.IsNullOrEmpty(userId))
                 return false;
 

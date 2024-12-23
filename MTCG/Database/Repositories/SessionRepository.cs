@@ -46,7 +46,7 @@ namespace MTCG.Database.Repositories
             int rowsAffected = command.ExecuteNonQuery();
         }
 
-        public string? Get(string userId)
+        public string? GetUserToken(string userId)
         {
             var commandText = """
                 SELECT session_token
@@ -78,6 +78,26 @@ namespace MTCG.Database.Repositories
             if (reader.Read())
                 return reader.GetString(0);
             return null;
+        }
+
+        internal bool TokenExists(string token)
+        {
+            var commandText = """
+                SELECT COUNT(*) 
+                FROM user_sessions 
+                WHERE session_token = @token
+            """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@token", DbType.String, token);
+            var result = command.ExecuteScalar();
+            return Convert.ToInt32(result) > 0;
+        }
+        public void DeleteByUserId(string userId)
+        {
+            var commandText = """DELETE FROM user_sessions WHERE user_id = @userId""";
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@token", DbType.String, userId.Trim());
+            int rowsAffected = command.ExecuteNonQuery();
         }
     }
 }

@@ -38,7 +38,8 @@ namespace MTCG.Services
 
         public bool VerifyToken(string token)
         {
-            return _sessionRepository.VerifyToken(token);
+            bool validation = _sessionRepository.VerifyToken(token);
+            return validation;
         }
 
         public void RevokeSession(string token)
@@ -46,12 +47,19 @@ namespace MTCG.Services
             _sessionRepository?.Delete(token);
         }
 
-        public string? GetSessionToken(string userId)
+        public void RevokeSessionByUserId(string userId)
         {
-            return _sessionRepository?.Get(userId);
+            _sessionRepository?.DeleteByUserId(userId);
         }
 
-        public string? GetUserId(string token)
+        public string? GetSessionByUser(string userId)
+        {
+            string? token = _sessionRepository?.GetUserToken(userId);
+            if (_sessionRepository.TokenExists(userId) && string.IsNullOrEmpty(token)) RevokeSessionByUserId(token);
+            return token;
+        }
+
+        public string? GetUserIdByToken(string token)
         {
             return _sessionRepository?.GetUserId(token);
         }
