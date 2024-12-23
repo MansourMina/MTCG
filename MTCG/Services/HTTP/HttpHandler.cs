@@ -168,13 +168,15 @@ namespace MTCG.Services.HTTP
             if (string.IsNullOrEmpty(request.Authorization))
                 return true;
 
-            AuthorizationTypes? authType = GetAuthorizationType(request.Authorization);
-            if (authType == AuthorizationTypes.All)
-                return true;
-
             string? role = GetAuthorizationRole(request.Authorization);
             string? token = GetAuthorizationToken(request.Authorization);
             string? holder = GetAuthorizationHolder(request.Authorization);
+
+            AuthorizationTypes? authType = GetAuthorizationType(role);
+            if (authType == AuthorizationTypes.All)
+                return true;
+
+            
 
             if (string.IsNullOrEmpty(role) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(holder))
                 return false;
