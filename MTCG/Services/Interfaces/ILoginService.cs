@@ -7,6 +7,5 @@ namespace MTCG.Services.Interfaces
         string CreateToken(User user);
         string Login(string name, string password);
         void Logout(string token);
-        bool VerifyToken(string token);
     }
 }

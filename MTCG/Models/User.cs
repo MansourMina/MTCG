@@ -19,6 +19,9 @@ namespace MTCG.Models
         [JsonInclude]
         public int? Elo { get; private set; }
         public string Token { get; private set; }
+
+        public string Id { get; private set; }
+
         public StatisticService statistic { get; private set; } = new StatisticService();
 
         [JsonConstructor]
@@ -34,11 +37,11 @@ namespace MTCG.Models
             Role = role;
         }
 
-        public User(string name, string password, Stack stack)
-        {
-            _setProperties(name, password);
-            Stack = stack;
-        }
+        //public User(string name, string password, Stack stack)
+        //{
+        //    _setProperties(name, password);
+        //    Stack = stack;
+        //}
 
         private void _setProperties(string name, string password)
         {
@@ -48,6 +51,10 @@ namespace MTCG.Models
             Elo = 100;
         }
 
+        public void SetId(string id)
+        {
+            Id = id;
+        }
         public void AddWin(int points)
         {
             Elo += points;

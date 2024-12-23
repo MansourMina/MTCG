@@ -8,51 +8,35 @@ namespace MTCG.Services
 {
     public class LoginService : ILoginService
     {
-        private readonly static Dictionary<string, string> _tokens = [];
+        private readonly SessionService _sessionService;
         private readonly IUserRepository? _userRepository;
 
         public LoginService()
         {
             _userRepository = new UserRepository();
+            _sessionService = new SessionService();
         }
         public LoginService(IUserRepository userRepository)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
+
+        public string CreateToken(User user)
+        {
+            throw new NotImplementedException();
+        }
+
         public string Login(string name, string password)
         {
             var user = _userRepository?.Get(name.Trim());
             if (user == null || !BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
                 throw new UnauthorizedAccessException("Invalid username or password");
-            return GetSessionToken(user) ?? CreateToken(user);
-        }
-
-        public string CreateToken(User user)
-        {
-            string token = Guid.NewGuid().ToString();
-            _tokens[token] = user.Username;
-            return token;
-        }
-        public bool VerifyToken(string token)
-        {
-            return _tokens.ContainsKey(token);
+            return _sessionService.GetSessionToken(user.Id) ?? _sessionService.CreateSession(user.Id);
         }
 
         public void Logout(string token)
         {
-            if (VerifyToken(token)) _tokens.Remove(token);
-        }
-
-        public static string? GetSessionToken(User user)
-        {
-            if (user == null) return null;
-            string? token = null;
-            foreach (var u in _tokens)
-            {
-                if (u.Value == user.Username)
-                    return u.Key;
-            }
-            return token;
+            if (_sessionService.VerifyToken(token)) _sessionService.RevokeSession(token);
         }
     }
 }

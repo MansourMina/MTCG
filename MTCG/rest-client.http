@@ -1,14 +1,13 @@
 ﻿# Authorization: Bearer kienboec-mtcgToken
 
-
-
 GET http://localhost:8000/ HTTP/1.1
 
 ### GET all users
 GET http://localhost:8000/users HTTP/1.1
 
 ### GET User by Username
-GET http://localhost:8000/users?Username=Mina HTTP/1.1
+GET http://localhost:8000/users/TestRole HTTP/1.1
+Authorization: Bearer TestRole-97caae5a-a734-4e8b-b86b-bf2349e3a0cd
 
 ### Register User
 POST http://localhost:8000/users HTTP/1.1
@@ -35,7 +34,7 @@ POST http://localhost:8000/sessions HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"Vamos1",
+    "Username":"TestRole",
     "Password":"Test1"
 }
 

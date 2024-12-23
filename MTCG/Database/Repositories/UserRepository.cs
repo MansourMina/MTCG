@@ -14,6 +14,7 @@ namespace MTCG.Database.Repositories
             var commandText = """
                 INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id, role)
                 VALUES (@username, @password, @coins, @elo, NULL, NULL, NULL, @role)
+                RETURNING id
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, user.Username);
@@ -21,14 +22,13 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@coins", DbType.Int32, user.Coins);
             DataLayer.AddParameterWithValue(command, "@elo", DbType.Int32, user.Elo);
             DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
-            //person.Id = (int)(dbCommand.ExecuteScalar() ?? 0);
             command.ExecuteNonQuery();
         }
 
         public List<User> GetAll()
         {
             var commandText = """
-            SELECT username, password, role, coins, elo
+            SELECT username, password, role, coins, elo, id
             FROM users
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -40,6 +40,7 @@ namespace MTCG.Database.Repositories
                 var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
                 user.SetCoins(reader.GetInt32(3));
                 user.SetElo(reader.GetInt32(4));
+                user.SetId(reader.GetString(5));
                 result.Add(user);
             }
             return result;
@@ -47,7 +48,7 @@ namespace MTCG.Database.Repositories
 
         public User? Get(string username)
         {
-            var commandText = """SELECT username, password, role, coins, elo  from users where username = @username""";
+            var commandText = """SELECT username, password, role, coins, elo, id from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username.Trim());
 
@@ -57,6 +58,26 @@ namespace MTCG.Database.Repositories
                 var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
                 user.SetCoins(reader.GetInt32(3));
                 user.SetElo(reader.GetInt32(4));
+                user.SetId(reader.GetString(5));
+                return user;
+            }
+
+            return null;
+        }
+
+        public User? GetById(string userId)
+        {
+            var commandText = """SELECT username, password, role, coins, elo, id from users where id = @id""";
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@id", DbType.String, userId.Trim());
+
+            using IDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
+                user.SetCoins(reader.GetInt32(3));
+                user.SetElo(reader.GetInt32(4));
+                user.SetId(reader.GetString(5));
                 return user;
             }
 
