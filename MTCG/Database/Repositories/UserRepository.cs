@@ -46,7 +46,7 @@ namespace MTCG.Database.Repositories
             return result;
         }
 
-        public User? Get(string username)
+        public User? GetByName(string username)
         {
             var commandText = """SELECT username, password, role, coins, elo, id from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);

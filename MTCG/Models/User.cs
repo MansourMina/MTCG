@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using MTCG.Database.Repositories;
 using MTCG.Services;
 
 namespace MTCG.Models
@@ -24,24 +25,29 @@ namespace MTCG.Models
 
         public StatisticService statistic { get; private set; } = new StatisticService();
 
+        private readonly UserRepository _userRepository;
+
         [JsonConstructor]
         private User() { }
 
         public User(string name, string password)
         {
             _setProperties(name, password);
+            _userRepository = new UserRepository();
+
         }
         public User(string name, string password, string role)
         {
             _setProperties(name, password);
             Role = role;
+            _userRepository = new UserRepository();
         }
 
-        //public User(string name, string password, Stack stack)
-        //{
-        //    _setProperties(name, password);
-        //    Stack = stack;
-        //}
+        public User(string name, string password, UserRepository userRepository)
+        {
+            _setProperties(name, password);
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        }
 
         private void _setProperties(string name, string password)
         {
@@ -122,5 +128,12 @@ namespace MTCG.Models
                 Stack.Cards.Remove(Stack.Cards[i]);
             }
         }
+
+        public void AcquirePackage(int costs, List<Card> cards)
+        {
+            Coins -= costs;
+            Stack.Set(cards);
+        }
+
     }
 }

@@ -25,7 +25,7 @@ namespace MTCG.Database.Repositories
             }
         }
 
-        public List<Card> GetAll()
+        public List<Package> GetAll()
         {
             var commandText = """
             SELECT c.name as card_name, c.damage as damage, c.id as card_id, p.id as package_id 
@@ -33,16 +33,25 @@ namespace MTCG.Database.Repositories
             JOIN packages_cards as pc ON c.id = pc.card_id 
             JOIN packages as p ON p.id = pc.package_id 
             """;
-            using IDbCommand command = _dal.CreateCommand(commandText);
 
-            List<Card> result = [];
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            var packages = new Dictionary<string, Package>();
+
             using IDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
                 var card = new Card(reader.GetString(0), reader.GetInt32(1), ElementType.Water, reader.GetString(2));
-                result.Add(card);
+                string packageId = reader.GetString(3);
+
+                if (!packages.ContainsKey(packageId))
+                {
+                    var package = new Package(packageId);
+                    packages[packageId] = package;
+                }
+                packages[packageId].Cards.Add(card);
             }
-            return result;
+
+            return packages.Values.ToList();
         }
 
         public Card? Get(string id)
@@ -117,6 +126,21 @@ namespace MTCG.Database.Repositories
             return Convert.ToInt32(result) > 0;
         }
 
+        public void Delete(string id)
+        {
+            var deletePackageCardsCommandText = """
+                DELETE from packages_cards WHERE package_id = @id
+                """;
+            using IDbCommand deletePackageCardsCommand = _dal.CreateCommand(deletePackageCardsCommandText);
+            DataLayer.AddParameterWithValue(deletePackageCardsCommand, "@id", DbType.String, id);
+            deletePackageCardsCommand.ExecuteNonQuery();
 
+            var deletePackageCommandText = """
+                DELETE from packages WHERE id = @id
+                """;
+            using IDbCommand deletePackageCommand = _dal.CreateCommand(deletePackageCommandText);
+            DataLayer.AddParameterWithValue(deletePackageCommand, "@id", DbType.String, id);
+            deletePackageCommand.ExecuteNonQuery();
+        }
     }
 }

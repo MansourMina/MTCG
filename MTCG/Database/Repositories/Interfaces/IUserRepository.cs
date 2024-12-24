@@ -6,7 +6,7 @@ namespace MTCG.Database.Repositories.Interfaces
     {
         void Add(User user);
         int Delete(string username);
-        User? Get(string username);
+        User? GetByName(string username);
         List<User> GetAll();
         void Update(string username, User user);
     }

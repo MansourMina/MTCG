@@ -8,6 +8,7 @@ namespace MTCGTest.Services
     public class LoginServiceTests
     {
         private LoginService _loginService;
+        //private SessionService _sessionService;
         private IUserRepository _mockedUserRepository;
 
         private User CreateUser(string username, string password)
@@ -30,7 +31,7 @@ namespace MTCGTest.Services
             string password = "testPassword";
             var user = CreateUser(username, password);
 
-            _mockedUserRepository.Get(username).Returns(user);
+            _mockedUserRepository.GetByName(username).Returns(user);
 
             // Act
             string token = _loginService.Login(username, password);
@@ -50,7 +51,7 @@ namespace MTCGTest.Services
             string password = "testPassword";
             string wrongPassword = "Wrong";
             var user = CreateUser(username, password);
-            _mockedUserRepository.Get(username).Returns(user);
+            _mockedUserRepository.GetByName(username).Returns(user);
 
             // Act & Assert
             var exception = Assert.Throws<UnauthorizedAccessException>(() => _loginService.Login(username, wrongPassword));
@@ -65,7 +66,7 @@ namespace MTCGTest.Services
             string password = "testPassword";
             var user = CreateUser(username, password);
 
-            _mockedUserRepository.Get(username).Returns(user);
+            _mockedUserRepository.GetByName(username).Returns(user);
 
             // Act
             string token = _loginService.Login(username, password);
@@ -83,7 +84,7 @@ namespace MTCGTest.Services
             string password = "testPassword";
             var user = CreateUser(username, password);
 
-            _mockedUserRepository.Get(username).Returns(user);
+            _mockedUserRepository.GetByName(username).Returns(user);
 
             // Act
             var loggedUserToken = LoginService.GetSessionToken(user);
@@ -100,7 +101,7 @@ namespace MTCGTest.Services
             string password = "testPassword";
             var user = CreateUser(username, password);
 
-            _mockedUserRepository.Get(username).Returns(user);
+            _mockedUserRepository.GetByName(username).Returns(user);
 
             // Act
             var token = _loginService.Login(username, password);
@@ -120,8 +121,8 @@ namespace MTCGTest.Services
             var user1 = CreateUser("user1", "password1");
             var user2 = CreateUser("user2", "password2");
 
-            _mockedUserRepository.Get("user1").Returns(user1);
-            _mockedUserRepository.Get("user2").Returns(user2);
+            _mockedUserRepository.GetByName("user1").Returns(user1);
+            _mockedUserRepository.GetByName("user2").Returns(user2);
 
             // Act
             string token1 = _loginService.Login("user1", "password1");

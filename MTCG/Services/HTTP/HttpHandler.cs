@@ -25,7 +25,8 @@ namespace MTCG.Services.HTTP
             NoContent = 204,
             BadRequest = 400,
             Unauthorized = 401,
-            Conflict = 409
+            Conflict = 409,
+            PaymentRequired = 402
         }
 
 
@@ -121,6 +122,11 @@ namespace MTCG.Services.HTTP
                 catch (UnauthorizedAccessException e)
                 {
                     finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
+                    finalResponse.Body = e.Message;
+                }
+                catch (NotSupportedException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.PaymentRequired;
                     finalResponse.Body = e.Message;
                 }
 
@@ -261,7 +267,7 @@ namespace MTCG.Services.HTTP
             UserRepository dbUser = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             string username = request.PathVariables?["username"];
-            User? user = dbUser.Get(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
+            User? user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
             response.Body = JsonSerializer.Serialize(user);
             return response;
         }
@@ -310,7 +316,25 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat AcquirePackage(HttpRequest request)
         {
-            throw new KeyNotFoundException($"Aqquiring package does not exist");
+            PackageService packageService= new();
+            UserRepository userRepository = new();
+
+            string? username = GetAuthorizationRole(request.Authorization);
+            User user = userRepository.GetByName(username);
+            if(user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
+            if (user.Coins < Package.Costs) throw new NotSupportedException("Not enough money");
+
+            Package package = packageService.PopRandom();
+            if(package == null) throw new KeyNotFoundException("No packages available");
+
+            user.AcquirePackage(Package.Costs, package.Cards);
+            
+            //foreach (var card in package.Cards)
+            //{
+            //    Console.WriteLine("Card:" + card.Name);
+            //}
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package aqquired successfully" };
+
         }
 
         private ResponseFormat UpdateUser(HttpRequest request)
@@ -322,7 +346,7 @@ namespace MTCG.Services.HTTP
             string username = request.PathVariables?["username"];
 
             UserRepository dbUser = new();
-            var user = dbUser.Get(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
+            var user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
             ChangeUserProperties(user, body);
             dbUser.Update(username, user);
 
@@ -332,24 +356,24 @@ namespace MTCG.Services.HTTP
         private static void ChangeUserProperties(User user, User body)
         {
             bool propertiesChanged = false;
-            if (!string.IsNullOrEmpty(body.Password) )
+            if (!string.IsNullOrEmpty(body.Password))
             {
                 user.ChangePassword(BCrypt.Net.BCrypt.EnhancedHashPassword(body.Password));
                 propertiesChanged = true;
             }
-            if (!string.IsNullOrEmpty(body.Username) )
+            if (!string.IsNullOrEmpty(body.Username))
             {
                 UserRepository dbUser = new();
-                if (dbUser.Get(body.Username) != null) throw new DuplicateNameException($"Username '{body.Username}' is already taken");
+                if (dbUser.GetByName(body.Username) != null) throw new DuplicateNameException($"Username '{body.Username}' is already taken");
                 user.ChangeUsername(body.Username);
                 propertiesChanged = true;
             }
-            if (body.Elo.HasValue )
+            if (body.Elo.HasValue)
             {
                 user.SetElo(body.Elo.Value);
                 propertiesChanged = true;
             }
-            if (body.Coins.HasValue )
+            if (body.Coins.HasValue)
             {
                 user.SetCoins(body.Coins.Value);
                 propertiesChanged = true;

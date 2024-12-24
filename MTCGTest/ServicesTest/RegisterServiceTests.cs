@@ -48,7 +48,7 @@ namespace MTCGTest.Services
             // Arrange
             string username = "testUser";
             string password = "testPassword";
-            _mockedUserRepository.Get(username).Returns(new User(username, password));
+            _mockedUserRepository.GetByName(username).Returns(new User(username, password));
 
             // Act & Assert
             var exception = Assert.Throws<InvalidOperationException>(() => _registerService.Register(username, password));

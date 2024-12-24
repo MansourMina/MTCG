@@ -25,7 +25,7 @@ namespace MTCG.Services
 
         public void Register(string name, string password, string role)
         {
-            var user = _userRepository?.Get(name.Trim());
+            var user = _userRepository?.GetByName(name.Trim());
             if (user != null) throw new InvalidOperationException("User already exists");
             if (string.IsNullOrWhiteSpace(name.Trim()) || string.IsNullOrWhiteSpace(password.Trim()))
                 throw new ArgumentException("Username or password cannot be empty.");
