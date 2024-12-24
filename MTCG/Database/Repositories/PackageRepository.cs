@@ -128,12 +128,12 @@ namespace MTCG.Database.Repositories
 
         public void Delete(string id)
         {
-            var deletePackageCardsCommandText = """
-                DELETE from packages_cards WHERE package_id = @id
-                """;
-            using IDbCommand deletePackageCardsCommand = _dal.CreateCommand(deletePackageCardsCommandText);
-            DataLayer.AddParameterWithValue(deletePackageCardsCommand, "@id", DbType.String, id);
-            deletePackageCardsCommand.ExecuteNonQuery();
+            //var deletePackageCardsCommandText = """
+            //    DELETE from packages_cards WHERE package_id = @id
+            //    """;
+            //using IDbCommand deletePackageCardsCommand = _dal.CreateCommand(deletePackageCardsCommandText);
+            //DataLayer.AddParameterWithValue(deletePackageCardsCommand, "@id", DbType.String, id);
+            //deletePackageCardsCommand.ExecuteNonQuery();
 
             var deletePackageCommandText = """
                 DELETE from packages WHERE id = @id

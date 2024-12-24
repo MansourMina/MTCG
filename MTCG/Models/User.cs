@@ -133,6 +133,8 @@ namespace MTCG.Models
         {
             Coins -= costs;
             Stack.Set(cards);
+            _userRepository.Update(Username, this);
+            // User db updaten
         }
 
     }

@@ -328,11 +328,8 @@ namespace MTCG.Services.HTTP
             if(package == null) throw new KeyNotFoundException("No packages available");
 
             user.AcquirePackage(Package.Costs, package.Cards);
-            
-            //foreach (var card in package.Cards)
-            //{
-            //    Console.WriteLine("Card:" + card.Name);
-            //}
+
+
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package aqquired successfully" };
 
         }
