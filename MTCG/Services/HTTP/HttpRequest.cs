@@ -11,6 +11,7 @@ namespace MTCG.Services.HTTP
         public Dictionary<string, string> Headers { get; set; } = [];
         public StringBuilder Body { get; private set; } = new StringBuilder();
         public string? Authorization { get; private set; }
+        public Dictionary<string, string>? PathVariables { get; set; } = new Dictionary<string, string>();
         public HttpRequest(StreamReader reader)
         {
             try

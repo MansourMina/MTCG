@@ -8,6 +8,8 @@ using System.Data;
 using System.IO;
 using System.Net;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Web;
 using static System.Collections.Specialized.BitVector32;
@@ -26,7 +28,7 @@ namespace MTCG.Services.HTTP
             Conflict = 409
         }
 
-        
+
         public struct ResponseFormat
         {
             public int Status;
@@ -51,79 +53,101 @@ namespace MTCG.Services.HTTP
 
             // Users
             Routes[new Route("/users", "POST", AuthorizationTypes.All)] = RegisterUser;
-            Routes[new Route("/users", "GET", AuthorizationTypes.OwnUser)] = GetUser;
-            Routes[new Route("/users", "DELETE", AuthorizationTypes.All)] = DeleteUser;
-            Routes[new Route("/users", "PUT", AuthorizationTypes.OwnUser)] = UpdateUser;
+            Routes[new Route("/users/{username}", "GET", AuthorizationTypes.OwnUser)] = GetUser;
+            Routes[new Route("/users", "GET", AuthorizationTypes.All)] = GetUsers;
+            Routes[new Route("/users/{username}", "DELETE", AuthorizationTypes.All)] = DeleteUser;
+            Routes[new Route("/users/{username}", "PUT", AuthorizationTypes.OwnUser)] = UpdateUser;
+
+            // Packages
             Routes[new Route("/packages", "POST", AuthorizationTypes.Admin)] = CreatePackage;
             Routes[new Route("/packages", "GET", AuthorizationTypes.All)] = GetPackages;
+            Routes[new Route("/transactions/packages", "POST", AuthorizationTypes.LoggedIn)] = AcquirePackage;
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
         {
             Console.WriteLine("-------------------------------------------");
-            string path = GetMainRoute(request.Path ?? string.Empty);
-            var clientRoute = new Route(path, request.Method, GetAuthorizationType(GetAuthorizationRole(request.Authorization)));
             Console.WriteLine(request.Method + " " + request.Path);
 
+            if (request == null)
+                throw new ArgumentNullException(nameof(request), "Invalid request");
+
+
+            var clientRoute = new Route(request.Path, request.Method);
             var finalResponse = new ResponseFormat { Status = (int)HTTPStatusCode.NotFound, Body = "Path Not found" };
 
             var foundRoute = ContainsRoute(clientRoute);
+            request.PathVariables = clientRoute.PathVariables;
+
+            if (!string.IsNullOrEmpty(request.Authorization))
+                SetRequestAuth(request, clientRoute);
+
             if (foundRoute != null)
             {
                 var (route, func) = foundRoute.Value;
-                if (!IsAuthorized(request) || clientRoute.Authorization != route.Authorization)
+                if ((!IsAuthorized(clientRoute) || clientRoute.AuthorizationType != route.AuthorizationType) && route.AuthorizationType != AuthorizationTypes.All)
                 {
                     finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
                     finalResponse.Body = "Authentication failed";
+                    SendResponse(response, finalResponse.Status, finalResponse.Body);
+                    return;
                 }
-                else
+                try
                 {
-                    try
-                    {
-                        var responseFormat = func(request);
-                        finalResponse.Status = responseFormat.Status;
-                        finalResponse.Body = responseFormat.Body;
-                    }
-                    catch (DuplicateNameException e)
-                    {
-                        finalResponse.Status = (int)HTTPStatusCode.Conflict;
-                        finalResponse.Body = e.Message;
-                    }
-                    catch (InvalidOperationException e)
-                    {
-                        finalResponse.Status = (int)HTTPStatusCode.Conflict;
-                        finalResponse.Body = e.Message;
-                    }
-                    catch (KeyNotFoundException e)
-                    {
-                        finalResponse.Status = (int)HTTPStatusCode.NotFound;
-                        finalResponse.Body = e.Message;
-                    }
-                    catch (ArgumentException e)
-                    {
-                        finalResponse.Status = (int)HTTPStatusCode.BadRequest;
-                        finalResponse.Body = e.Message;
-                    }
-                    catch (UnauthorizedAccessException e)
-                    {
-                        finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
-                        finalResponse.Body = e.Message;
-                    }
+                    var responseFormat = func(request);
+                    finalResponse.Status = responseFormat.Status;
+                    finalResponse.Body = responseFormat.Body;
                 }
-                
+                catch (DuplicateNameException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.Conflict;
+                    finalResponse.Body = e.Message;
+                }
+                catch (InvalidOperationException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.Conflict;
+                    finalResponse.Body = e.Message;
+                }
+                catch (KeyNotFoundException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.NotFound;
+                    finalResponse.Body = e.Message;
+                }
+                catch (ArgumentException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.BadRequest;
+                    finalResponse.Body = e.Message;
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
+                    finalResponse.Body = e.Message;
+                }
+
             }
             SendResponse(response, finalResponse.Status, finalResponse.Body);
         }
 
-        private AuthorizationTypes? GetAuthorizationType(string? authorization)
+        private void SetRequestAuth(HttpRequest request, Route route)
         {
-            if (string.IsNullOrEmpty(authorization)) return AuthorizationTypes.All;
-            switch (authorization)
+            route.SetToken(GetAuthorizationToken(request.Authorization));
+            route.SetRole(GetAuthorizationRole(request.Authorization));
+            route.SetAuthorizationType(GetAuthorizationType(request) ?? AuthorizationTypes.All);
+            route.SetHolder(GetAuthorizationHolder(request.Authorization));
+        }
+
+        private AuthorizationTypes? GetAuthorizationType(HttpRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Authorization)) return AuthorizationTypes.All;
+            string role = GetAuthorizationRole(request.Authorization);
+            switch (role)
             {
                 case "admin":
                     return AuthorizationTypes.Admin;
                 default:
-                    return AuthorizationTypes.OwnUser;
+                    if (request.PathVariables.Count() > 0)
+                        return AuthorizationTypes.OwnUser;
+                    else return AuthorizationTypes.LoggedIn;
             }
         }
 
@@ -163,26 +187,17 @@ namespace MTCG.Services.HTTP
         }
 
 
-        public bool IsAuthorized(HttpRequest request)
+        public bool IsAuthorized(Route request)
         {
-            if (string.IsNullOrEmpty(request.Authorization))
+            if (request.AuthorizationType == AuthorizationTypes.All)
                 return true;
 
-            string? role = GetAuthorizationRole(request.Authorization);
-            string? token = GetAuthorizationToken(request.Authorization);
-            string? holder = GetAuthorizationHolder(request.Authorization);
 
-            AuthorizationTypes? authType = GetAuthorizationType(role);
-            if (authType == AuthorizationTypes.All)
-                return true;
-
-            
-
-            if (string.IsNullOrEmpty(role) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(holder))
+            if (request.Token == null || request.Holder == null)
                 return false;
 
             var sessionService = new SessionService();
-            string? userId = sessionService.GetUserIdByToken(token);
+            string? userId = sessionService.GetUserIdByToken(request.Token);
             if (string.IsNullOrEmpty(userId))
                 return false;
 
@@ -191,24 +206,26 @@ namespace MTCG.Services.HTTP
             if (sessionUser == null)
                 return false;
 
-            if(authType == AuthorizationTypes.OwnUser)
+            if (request.AuthorizationType == AuthorizationTypes.LoggedIn)
+                return true;
+            if (request.AuthorizationType == AuthorizationTypes.OwnUser)
             {
-                string? username = ExtractPath(request.Path ?? string.Empty);
-                if (sessionUser.Username == role && username == sessionUser.Username)
+                string username = request.PathVariables?["username"];
+                if (sessionUser.Username == request.Role && username == sessionUser.Username)
                     return true;
             }
-            else if (authType == AuthorizationTypes.Admin && sessionUser.Role == role) return true;
+            else if (request.AuthorizationType == AuthorizationTypes.Admin && sessionUser.Role == request.Role) return true;
             return false;
         }
-
 
 
         private (Route route, Func<HttpRequest, ResponseFormat> handler)? ContainsRoute(Route request)
         {
             foreach (var route in Routes)
             {
-                if (route.Key.Path == request.Path && route.Key.Method == request.Method)
+                if (route.Key.Method == request.Method && route.Key.Matches(request.Path ?? string.Empty))
                 {
+                    request.PathVariables = route.Key.PathVariables;
                     return (route.Key, route.Value);
                 }
             }
@@ -231,21 +248,21 @@ namespace MTCG.Services.HTTP
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = token };
         }
 
+        private ResponseFormat GetUsers(HttpRequest request)
+        {
+            UserRepository dbUser = new();
+            ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
+            var users = dbUser.GetAll();
+            response.Body = JsonSerializer.Serialize(users);
+            return response;
+        }
         private ResponseFormat GetUser(HttpRequest request)
         {
             UserRepository dbUser = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
-            string? username = ExtractPath(request.Path ?? string.Empty);
-            if (username != null)
-            {
-                User? user = dbUser.Get(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
-                response.Body = JsonSerializer.Serialize(user);
-            }
-            else
-            {
-                var users = dbUser.GetAll();
-                response.Body = JsonSerializer.Serialize(users);
-            }
+            string username = request.PathVariables?["username"];
+            User? user = dbUser.Get(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
+            response.Body = JsonSerializer.Serialize(user);
             return response;
         }
 
@@ -276,10 +293,10 @@ namespace MTCG.Services.HTTP
         {
             PackageRepository dbPackage = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
-            string? query = ExtractPath(request.Path ?? string.Empty);
-            if (query != null)
+            string? packageId = ExtractPath(request.Path ?? string.Empty);
+            if (packageId != null)
             {
-                Card? package = dbPackage.Get(query) ?? throw new KeyNotFoundException($"Package '{query}' does not exist");
+                Card? package = dbPackage.Get(packageId) ?? throw new KeyNotFoundException($"Package '{packageId}' does not exist");
                 response.Body = JsonSerializer.Serialize(package);
             }
             else
@@ -290,14 +307,19 @@ namespace MTCG.Services.HTTP
             return response;
         }
 
+
+        private ResponseFormat AcquirePackage(HttpRequest request)
+        {
+            throw new KeyNotFoundException($"Aqquiring package does not exist");
+        }
+
         private ResponseFormat UpdateUser(HttpRequest request)
         {
             var body = JsonSerializer.Deserialize<User>(request.Body.ToString());
-            if (string.IsNullOrEmpty(request.Path) || request.Path.Split('/').Length <= 2 || body == null)
+            if (string.IsNullOrEmpty(request.Path) || request.PathVariables?.Count == 0 || body == null)
                 throw new ArgumentException("Failed to update user");
 
-            string[] pathParts = request.Path.Split('/');
-            string username = pathParts[2];
+            string username = request.PathVariables?["username"];
 
             UserRepository dbUser = new();
             var user = dbUser.Get(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
@@ -310,29 +332,30 @@ namespace MTCG.Services.HTTP
         private static void ChangeUserProperties(User user, User body)
         {
             bool propertiesChanged = false;
-            if (!string.IsNullOrEmpty(body.Password))
+            if (!string.IsNullOrEmpty(body.Password) )
             {
                 user.ChangePassword(BCrypt.Net.BCrypt.EnhancedHashPassword(body.Password));
                 propertiesChanged = true;
             }
-            if (!string.IsNullOrEmpty(body.Username))
+            if (!string.IsNullOrEmpty(body.Username) )
             {
                 UserRepository dbUser = new();
-                if(dbUser.Get(body.Username) != null) throw new DuplicateNameException($"Username '{body.Username}' is already taken");
+                if (dbUser.Get(body.Username) != null) throw new DuplicateNameException($"Username '{body.Username}' is already taken");
                 user.ChangeUsername(body.Username);
                 propertiesChanged = true;
             }
-            if (body.Elo.HasValue)
-            { 
+            if (body.Elo.HasValue )
+            {
                 user.SetElo(body.Elo.Value);
                 propertiesChanged = true;
             }
-            if (body.Coins.HasValue)
-            { 
+            if (body.Coins.HasValue )
+            {
                 user.SetCoins(body.Coins.Value);
                 propertiesChanged = true;
             }
-            if(!propertiesChanged) throw new ArgumentException($"Failed to update user");
+            //else throw new InvalidOperationException("No changes have been made");
+            if (!propertiesChanged) throw new ArgumentException($"Failed to update user");
         }
 
         public static string GetMainRoute(string url)
@@ -362,7 +385,7 @@ namespace MTCG.Services.HTTP
 
             // Nimm das letzte Segment nach dem letzten '/'
             var segments = path.Split('/');
-            return segments.Length > 0 ? segments[^1] : null;
+            return segments.Length > 1 ? segments[^1] : null;
         }
     }
 }

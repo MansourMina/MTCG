@@ -10,6 +10,7 @@ namespace MTCG.Models
     {
         All,
         OwnUser,
-        Admin
+        Admin,
+        LoggedIn
     }
 }
