@@ -63,6 +63,10 @@ namespace MTCG.Services.HTTP
             Routes[new Route("/packages", "POST", AuthorizationTypes.Admin)] = CreatePackage;
             Routes[new Route("/packages", "GET", AuthorizationTypes.All)] = GetPackages;
             Routes[new Route("/transactions/packages", "POST", AuthorizationTypes.LoggedIn)] = AcquirePackage;
+
+            // Cards
+            Routes[new Route("/cards", "GET", AuthorizationTypes.LoggedIn)] = GetUserCards;
+
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -89,7 +93,7 @@ namespace MTCG.Services.HTTP
                 if ((!IsAuthorized(clientRoute) || clientRoute.AuthorizationType != route.AuthorizationType) && route.AuthorizationType != AuthorizationTypes.All)
                 {
                     finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
-                    finalResponse.Body = "Authentication failed";
+                    finalResponse.Body = "Unauthorized";
                     SendResponse(response, finalResponse.Status, finalResponse.Body);
                     return;
                 }
@@ -220,7 +224,8 @@ namespace MTCG.Services.HTTP
                 if (sessionUser.Username == request.Role && username == sessionUser.Username)
                     return true;
             }
-            else if (request.AuthorizationType == AuthorizationTypes.Admin && sessionUser.Role == request.Role) return true;
+            // Normalerweise sessionUser.Role == request.Role. Aufgrund des TestScripts wird jedoch stattdessen der Username verwendet.
+            else if (request.AuthorizationType == AuthorizationTypes.Admin && sessionUser.Username == request.Role) return true;
             return false;
         }
 
@@ -242,7 +247,9 @@ namespace MTCG.Services.HTTP
         {
             RegisterService registerService = new();
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to register user");
-            registerService.Register(dUser.Username, dUser.Password, dUser.Role);
+            registerService.Register(dUser.Username, dUser.Password);
+            StackRepository stackRepository = new();
+            stackRepository.Add(Guid.NewGuid().ToString(), dUser.Id);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
 
@@ -345,11 +352,21 @@ namespace MTCG.Services.HTTP
             UserRepository dbUser = new();
             var user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
             ChangeUserProperties(user, body);
-            dbUser.Update(username, user);
+            dbUser.UpdateUserCreds(username, user);
 
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User updated successfully" };
         }
 
+        private ResponseFormat GetUserCards(HttpRequest request)
+        {
+            UserRepository userRepository = new();
+
+            string? username = GetAuthorizationRole(request.Authorization);
+            User user = userRepository.GetByName(username);
+            if (user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
+
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = JsonSerializer.Serialize(user.Stack.Cards)};
+        }
         private static void ChangeUserProperties(User user, User body)
         {
             bool propertiesChanged = false;

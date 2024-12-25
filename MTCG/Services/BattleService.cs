@@ -65,7 +65,7 @@ namespace MTCG.Services
                 Console.WriteLine($"Right Player Lost - he has {RightPlayer.CardsCount()} Cards left");
             else
             {
-                Console.WriteLine($"{(RightPlayer.statistic.Wins > LeftPlayer.statistic.Wins ? "Right" : "Left")} WON");
+                Console.WriteLine($"{(RightPlayer.Statistic.Wins > LeftPlayer.Statistic.Wins ? "Right" : "Left")} WON");
             }
             Console.WriteLine("Left Player Deck: " + LeftPlayer.Deck.Cards.Count);
             Console.WriteLine("Left Player Stack: " + LeftPlayer.Stack.Cards.Count);

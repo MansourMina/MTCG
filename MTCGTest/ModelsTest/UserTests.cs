@@ -107,7 +107,7 @@ namespace MTCGTest.Models
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(110));
-            Assert.That(user.statistic.Wins, Is.EqualTo(1));
+            Assert.That(user.Statistic.Wins, Is.EqualTo(1));
         }
 
 
@@ -126,7 +126,7 @@ namespace MTCGTest.Models
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(5));
-            Assert.That(user.statistic.Losses, Is.EqualTo(1));
+            Assert.That(user.Statistic.Losses, Is.EqualTo(1));
 
         }
 
@@ -145,7 +145,7 @@ namespace MTCGTest.Models
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(0));
-            Assert.That(user.statistic.Losses, Is.EqualTo(1));
+            Assert.That(user.Statistic.Losses, Is.EqualTo(1));
         }
 
 
@@ -161,7 +161,7 @@ namespace MTCGTest.Models
             user.AddDraw();
 
             // Assert
-            Assert.That(user.statistic.Draws, Is.EqualTo(1));
+            Assert.That(user.Statistic.Draws, Is.EqualTo(1));
         }
 
 

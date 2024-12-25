@@ -8,6 +8,6 @@ namespace MTCG.Database.Repositories.Interfaces
         int Delete(string username);
         User? GetByName(string username);
         List<User> GetAll();
-        void Update(string username, User user);
+        void UpdateUserCreds(string username, User user);
     }
 }

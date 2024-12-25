@@ -12,8 +12,8 @@ namespace MTCG.Database.Repositories
         public void Add(User user)
         {
             var commandText = """
-                INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id, role)
-                VALUES (@username, @password, @coins, @elo, NULL, NULL, NULL, @role)
+                INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id)
+                VALUES (@username, @password, @coins, @elo, @stack_id, @deck_id, @statistic_id)
                 RETURNING id
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -21,7 +21,9 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@password", DbType.String, user.Password);
             DataLayer.AddParameterWithValue(command, "@coins", DbType.Int32, user.Coins);
             DataLayer.AddParameterWithValue(command, "@elo", DbType.Int32, user.Elo);
-            DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
+            DataLayer.AddParameterWithValue(command, "@stack_id", DbType.String, user.Stack.Id);
+            DataLayer.AddParameterWithValue(command, "@deck_id", DbType.String, user.Deck.Id);
+            DataLayer.AddParameterWithValue(command, "@statistic_id", DbType.String, user.Statistic.Id);
             command.ExecuteNonQuery();
         }
 
@@ -84,9 +86,8 @@ namespace MTCG.Database.Repositories
             return null;
         }
 
-        public void Update(string username, User user)
+        public void UpdateUserCreds(string username, User user)
         {
-
             var commandText = """
             UPDATE users 
             SET username = @newUsername, elo = @elo, coins = @coins, password = @password, role = @role
@@ -100,7 +101,9 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username);
             DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
             command.ExecuteNonQuery();
+
         }
+
 
         public int Delete(string username)
         {

@@ -7,7 +7,6 @@ namespace MTCG.Models
 
     public class User
     {
-        [JsonInclude]
         public string Role { get; private set; }
         [JsonInclude]
         public string Username { get; private set; }
@@ -15,17 +14,18 @@ namespace MTCG.Models
         public string Password { get; private set; }
         [JsonInclude]
         public int? Coins { get; private set; }
-        public Stack Stack { get; private set; } = new Stack();
-        public Deck Deck { get; private set; } = new Deck();
+        public Stack Stack { get; private set; }
+        public Deck Deck { get; private set; }
         [JsonInclude]
         public int? Elo { get; private set; }
         public string Token { get; private set; }
 
         public string Id { get; private set; }
 
-        public StatisticService statistic { get; private set; } = new StatisticService();
+        public StatisticService Statistic { get; private set; } = new StatisticService();
 
         private readonly UserRepository _userRepository;
+        private readonly StackRepository _stackRepository;
 
         [JsonConstructor]
         private User() { }
@@ -55,6 +55,8 @@ namespace MTCG.Models
             Password = password;
             Coins = 20;
             Elo = 100;
+            Stack = new Stack();
+            Deck = new Deck();
         }
 
         public void SetId(string id)
@@ -64,18 +66,18 @@ namespace MTCG.Models
         public void AddWin(int points)
         {
             Elo += points;
-            statistic.AddWin();
+            Statistic.AddWin();
         }
 
         public void AddLosses(int points)
         {
             Elo = (Elo - points < 0) ? 0 : Elo - points;
-            statistic.AddLosses();
+            Statistic.AddLosses();
         }
 
         public void AddDraw()
         {
-            statistic.AddDraw();
+            Statistic.AddDraw();
         }
 
         public bool NoCardsLeft()
@@ -133,8 +135,8 @@ namespace MTCG.Models
         {
             Coins -= costs;
             Stack.Set(cards);
-            _userRepository.Update(Username, this);
-            // User db updaten
+            _userRepository.UpdateUserCreds(Username, this);
+            _stackRepository.AddCards(this.Stack.Id, this.Stack.Cards);
         }
 
     }

@@ -1,8 +1,13 @@
-﻿namespace MTCG.Models
+﻿using MTCG.Database.Repositories;
+
+namespace MTCG.Models
 {
     public class Stack
     {
         public List<Card> Cards { get; private set; }
+        public string Id { get; private set; }
+
+        private readonly StackRepository _stackRepository;
 
         public void addCard(Card card)
         {
@@ -17,7 +22,9 @@
 
         public Stack()
         {
+
             Cards = new List<Card>();
+            Id = new Guid
         }
 
         public void removeCard(Card card)
@@ -27,15 +34,6 @@
 
         public Card? popRandomCard()
         {
-            //if (Cards.Count == 0) return null;
-            //Card? highestCard = null;
-            //foreach (Card card in Cards)
-            //{
-            //    if (highestCard == null || card.Damage > highestCard.Damage)
-            //        highestCard = card;
-            //}
-            //removeCard(highestCard);
-            //return highestCard;
             if(Cards.Count == 0) return null;
 
             Random rnd = new Random();
@@ -43,6 +41,7 @@
             Cards.Remove(card);
             return card;
         }
+
 
     }
 }
