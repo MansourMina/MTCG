@@ -28,7 +28,7 @@ namespace MTCG.Database.Repositories
         public List<Package> GetAll()
         {
             var commandText = """
-            SELECT c.name as card_name, c.damage as damage, c.id as card_id, p.id as package_id 
+            SELECT c.name as card_name, c.damage as damage, c.element_type as element_type, c.card_type as card_type, c.id as card_id, p.id as package_id 
             from cards as c 
             JOIN packages_cards as pc ON c.id = pc.card_id 
             JOIN packages as p ON p.id = pc.package_id 
@@ -40,7 +40,13 @@ namespace MTCG.Database.Repositories
             using IDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                var card = new Card(reader.GetString(0), reader.GetInt32(1), ElementType.Water, reader.GetString(2));
+                var card = new Card(
+                    reader.GetString(0),
+                    reader.GetInt32(1),
+                    Enum.Parse<ElementType>(reader.GetString(2)),
+                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetString(4)
+                );
                 string packageId = reader.GetString(3);
 
                 if (!packages.ContainsKey(packageId))
@@ -57,7 +63,7 @@ namespace MTCG.Database.Repositories
         public Card? Get(string id)
         {
             var commandText = """
-                SELECT c.name as card_name, c.damage as damage, c.id as card_id, p.id as package_id 
+                SELECT c.name as card_name, c.damage as damage, c.element_type as element_type, c.card_type as card_type, c.id as card_id, p.id as package_id 
                 from cards as c 
                 JOIN packages_cards as pc ON c.id = pc.card_id 
                 JOIN packages as p ON p.id = pc.package_id 
@@ -69,7 +75,13 @@ namespace MTCG.Database.Repositories
             using IDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                var card = new Card(reader.GetString(0), reader.GetInt32(1), ElementType.Water, reader.GetString(2));
+                var card = new Card(
+                    reader.GetString(0),
+                    reader.GetInt32(1),
+                    Enum.Parse<ElementType>(reader.GetString(2)),
+                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetString(4)
+                );
                 return card;
             }
 
@@ -89,15 +101,19 @@ namespace MTCG.Database.Repositories
 
         private string AddCard(Card card)
         {
+            Console.WriteLine(card.ElementType.ToString());
+            Console.WriteLine(card.CardType.ToString());
             var commandText = """
-                INSERT INTO cards(id, name, damage)
-                VALUES (@id, @name, @damage)
+                INSERT INTO cards(id, name, damage, element_type, card_type)
+                VALUES (@id, @name, @damage, @element_type, @card_type)
                 RETURNING id
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@id", DbType.String, card.Id);
             DataLayer.AddParameterWithValue(command, "@name", DbType.String, card.Name);
             DataLayer.AddParameterWithValue(command, "@damage", DbType.Int32, card.Damage);
+            DataLayer.AddParameterWithValue(command, "@element_type", DbType.String, card.ElementType.ToString());
+            DataLayer.AddParameterWithValue(command, "@card_type", DbType.String, card.CardType.ToString());
             return command.ExecuteScalar() as string ?? "";
         }
 

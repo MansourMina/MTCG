@@ -5,6 +5,7 @@ namespace MTCG.Models
     public class Deck
     {
         public List<Card> Cards { get; private set; }
+        public string Id { get; private set; }
         public Deck(int deck_size = BattleService.DeckSize)
         {
             Cards = new List<Card>(deck_size);
@@ -27,7 +28,11 @@ namespace MTCG.Models
             }
         }
 
-        
+        public void SetId(string id)
+        {
+            Id = id;
+        }
+
 
         public void removeCard(Card card)
         {

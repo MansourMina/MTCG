@@ -1,10 +1,9 @@
 ﻿namespace MTCG.Models.Cards.MonsterCards
 {
-    public class Goblin : MonsterCard
+    public class Ork : MonsterCard
     {
         public static readonly ElementType ElementType = ElementType.Normal;
-
-        public Goblin(int damage, string id) : base(typeof(Goblin).ToString(), damage, ElementType, id)
+        public Ork(int damage, string id) : base(typeof(Ork).ToString(), damage, ElementType, id)
         {
 
         }

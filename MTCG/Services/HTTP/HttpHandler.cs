@@ -12,7 +12,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Web;
+using System.Xml.Linq;
 using static System.Collections.Specialized.BitVector32;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace MTCG.Services.HTTP
 {
     public class HttpHandler
@@ -245,11 +247,15 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat RegisterUser(HttpRequest request)
         {
-            RegisterService registerService = new();
-            var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to register user");
-            registerService.Register(dUser.Username, dUser.Password);
+            UserManager registerService = new();
             StackRepository stackRepository = new();
-            stackRepository.Add(Guid.NewGuid().ToString(), dUser.Id);
+            DeckRepository deckRepository = new();
+
+            var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to register user");
+
+            // Create User
+            registerService.Register(dUser.Username, dUser.Password);
+            
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
 
@@ -264,17 +270,22 @@ namespace MTCG.Services.HTTP
         private ResponseFormat GetUsers(HttpRequest request)
         {
             UserRepository dbUser = new();
+            CardRepository dbCard = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             var users = dbUser.GetAll();
+            foreach(var user in users)
+                user.Stack.Set(dbCard.GetCards(user.Stack.Id));
             response.Body = JsonSerializer.Serialize(users);
             return response;
         }
         private ResponseFormat GetUser(HttpRequest request)
         {
             UserRepository dbUser = new();
+            CardRepository dbCard = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             string username = request.PathVariables?["username"];
             User? user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
+            user.Stack.Set(dbCard.GetCards(user.Stack.Id));
             response.Body = JsonSerializer.Serialize(user);
             return response;
         }
@@ -297,6 +308,12 @@ namespace MTCG.Services.HTTP
         private ResponseFormat CreatePackage(HttpRequest request)
         {
             var dPackage = JsonSerializer.Deserialize<List<Card>>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to create package");
+            foreach(var card in dPackage)
+            {
+                card.SetElementType(card.Name);
+                card.SetCardType(card.Name);
+
+            }
             PackageService packageService = new();
             packageService.Add(new Package(dPackage, Guid.NewGuid().ToString()));
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package created successfully" };
@@ -325,18 +342,20 @@ namespace MTCG.Services.HTTP
         {
             PackageService packageService= new();
             UserRepository userRepository = new();
+            StackRepository stackRepository = new();
 
             string? username = GetAuthorizationRole(request.Authorization);
-            User user = userRepository.GetByName(username);
+
+            if(string.IsNullOrEmpty(username)) throw new ArgumentException("Failed to aqquire package");
+            User? user = userRepository.GetByName(username);
             if(user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
             if (user.Coins < Package.Costs) throw new NotSupportedException("Not enough money");
 
-            Package package = packageService.PopRandom();
+            Package? package = packageService.PopRandom();
             if(package == null) throw new KeyNotFoundException("No packages available");
 
             user.AcquirePackage(Package.Costs, package.Cards);
-
-
+            stackRepository.AddCards(user.Stack.Id, package.Cards);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package aqquired successfully" };
 
         }
@@ -344,10 +363,10 @@ namespace MTCG.Services.HTTP
         private ResponseFormat UpdateUser(HttpRequest request)
         {
             var body = JsonSerializer.Deserialize<User>(request.Body.ToString());
-            if (string.IsNullOrEmpty(request.Path) || request.PathVariables?.Count == 0 || body == null)
-                throw new ArgumentException("Failed to update user");
+            string? username = request.PathVariables?["username"];
 
-            string username = request.PathVariables?["username"];
+            if (string.IsNullOrEmpty(request.Path) || request.PathVariables?.Count == 0 || body == null || string.IsNullOrEmpty(username))
+                throw new ArgumentException("Failed to update user");
 
             UserRepository dbUser = new();
             var user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
@@ -362,7 +381,10 @@ namespace MTCG.Services.HTTP
             UserRepository userRepository = new();
 
             string? username = GetAuthorizationRole(request.Authorization);
-            User user = userRepository.GetByName(username);
+
+            if (string.IsNullOrEmpty(username)) throw new ArgumentException("Failed to get Cards");
+
+            User? user = userRepository.GetByName(username);
             if (user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
 
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = JsonSerializer.Serialize(user.Stack.Cards)};

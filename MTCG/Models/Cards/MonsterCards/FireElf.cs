@@ -1,9 +1,9 @@
 ﻿namespace MTCG.Models.Cards.MonsterCards
 {
-    public class Dragon : MonsterCard
+    public class FireElf : MonsterCard
     {
         public static readonly ElementType ElementType = ElementType.Fire;
-        public Dragon(int damage, string id) : base(typeof(Dragon).ToString(), damage, ElementType, id)
+        public FireElf(int damage, string id) : base(typeof(FireElf).ToString(), damage, ElementType, id)
         {
 
         }

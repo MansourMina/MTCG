@@ -2,7 +2,8 @@
 {
     public class Kraken : MonsterCard
     {
-        public Kraken(int damage, string id) : base(typeof(Kraken).ToString(), damage, ElementType.Water, id)
+        public static readonly ElementType ElementType = ElementType.Water;
+        public Kraken(int damage, string id) : base(typeof(Kraken).ToString(), damage, ElementType, id)
         {
 
         }

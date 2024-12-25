@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Data;
+using System.Text.Json.Serialization;
 using MTCG.Database.Repositories;
 using MTCG.Services;
 
@@ -14,8 +15,8 @@ namespace MTCG.Models
         public string Password { get; private set; }
         [JsonInclude]
         public int? Coins { get; private set; }
-        public Stack Stack { get; private set; }
-        public Deck Deck { get; private set; }
+        public Stack Stack { get; private set; } = new Stack();
+        public Deck Deck { get; private set; } = new Deck();
         [JsonInclude]
         public int? Elo { get; private set; }
         public string Token { get; private set; }
@@ -43,6 +44,15 @@ namespace MTCG.Models
             _userRepository = new UserRepository();
         }
 
+        public User(string name, string password, string stack_id, string deck_id, string statistic_id)
+        {
+            _setProperties(name, password);
+            Stack.SetId(stack_id);
+            Deck.SetId(deck_id);
+            Statistic.SetId(statistic_id);
+            _userRepository = new UserRepository();
+        }
+
         public User(string name, string password, UserRepository userRepository)
         {
             _setProperties(name, password);
@@ -55,8 +65,7 @@ namespace MTCG.Models
             Password = password;
             Coins = 20;
             Elo = 100;
-            Stack = new Stack();
-            Deck = new Deck();
+            
         }
 
         public void SetId(string id)
@@ -136,7 +145,6 @@ namespace MTCG.Models
             Coins -= costs;
             Stack.Set(cards);
             _userRepository.UpdateUserCreds(Username, this);
-            _stackRepository.AddCards(this.Stack.Id, this.Stack.Cards);
         }
 
     }

@@ -20,11 +20,16 @@ namespace MTCG.Models
                 addCard(cards[card]);
         }
 
-        public Stack()
+        public Stack(string id)
         {
 
             Cards = new List<Card>();
-            Id = new Guid
+            Id = id;
+        }
+
+        public Stack()
+        {
+            Cards = new List<Card>();
         }
 
         public void removeCard(Card card)
@@ -40,6 +45,11 @@ namespace MTCG.Models
             var card = Cards[rnd.Next(Cards.Count)];
             Cards.Remove(card);
             return card;
+        }
+
+        public void SetId(string id)
+        {
+            Id = id;
         }
 
 

@@ -2,7 +2,7 @@
 
 namespace MTCG.Services.Interfaces
 {
-    public interface IRegisterService
+    public interface IUserManager
     {
         ILoginService GetLoginService();
         IUserRepository GetUserRepository();

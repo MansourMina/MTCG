@@ -1,4 +1,5 @@
-﻿using MTCG.Database.Repositories.Interfaces;
+﻿using Microsoft.VisualBasic;
+using MTCG.Database.Repositories.Interfaces;
 using MTCG.Models;
 using System.Data;
 
@@ -30,7 +31,7 @@ namespace MTCG.Database.Repositories
         public List<User> GetAll()
         {
             var commandText = """
-            SELECT username, password, role, coins, elo, id
+            SELECT username, password, role, coins, elo, id, stack_id, deck_id, statistic_id
             FROM users
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -43,47 +44,58 @@ namespace MTCG.Database.Repositories
                 user.SetCoins(reader.GetInt32(3));
                 user.SetElo(reader.GetInt32(4));
                 user.SetId(reader.GetString(5));
+                var stack_id = reader.GetString(6);
+                user.Stack.SetId(stack_id);
+                user.Deck.SetId(reader.GetString(7));
+                user.Statistic.SetId(reader.GetString(8));
                 result.Add(user);
             }
+
             return result;
         }
 
         public User? GetByName(string username)
         {
-            var commandText = """SELECT username, password, role, coins, elo, id from users where username = @username""";
+            var commandText = """SELECT username, password, role, coins, elo, id, stack_id, deck_id, statistic_id from users where username = @username""";
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username.Trim());
 
             using IDataReader reader = command.ExecuteReader();
+            User? user = null;
             if (reader.Read())
             {
-                var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
+                user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
                 user.SetCoins(reader.GetInt32(3));
                 user.SetElo(reader.GetInt32(4));
                 user.SetId(reader.GetString(5));
-                return user;
+                string stack_id = reader.GetString(6);
+                user.Stack.SetId(stack_id);
+                user.Deck.SetId(reader.GetString(7));
+                user.Statistic.SetId(reader.GetString(8));
             }
-
-            return null;
+            return user;
         }
 
         public User? GetById(string userId)
         {
-            var commandText = """SELECT username, password, role, coins, elo, id from users where id = @id""";
+            var commandText = """SELECT username, password, role, coins, elo, id, stack_id, deck_id, statistic_id from users where id = @id""";
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@id", DbType.String, userId.Trim());
 
             using IDataReader reader = command.ExecuteReader();
+            User? user = null;
             if (reader.Read())
             {
-                var user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
+                user = new User(reader.GetString(0), reader.GetString(1), reader.GetString(2));
                 user.SetCoins(reader.GetInt32(3));
                 user.SetElo(reader.GetInt32(4));
                 user.SetId(reader.GetString(5));
-                return user;
+                string stack_id = reader.GetString(6);
+                user.Stack.SetId(stack_id);
+                user.Deck.SetId(reader.GetString(7));
+                user.Statistic.SetId(reader.GetString(8));
             }
-
-            return null;
+            return user;
         }
 
         public void UpdateUserCreds(string username, User user)
@@ -113,5 +125,7 @@ namespace MTCG.Database.Repositories
             int rowsAffected = command.ExecuteNonQuery();
             return rowsAffected;
         }
+
+
     }
 }

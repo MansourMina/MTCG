@@ -9,7 +9,7 @@ namespace MTCGTest.Services
     public class RegisterServiceTests
     {
         private ILoginService _mockedLoginService;
-        private RegisterService _registerService;
+        private UserManager _registerService;
         private IUserRepository _mockedUserRepository;
 
         [SetUp]
@@ -71,7 +71,7 @@ namespace MTCGTest.Services
         public void RegisterService_ShouldInitializeLoginServiceAndUserRepository()
         {
             // Act
-            var registerService = new RegisterService();
+            var registerService = new UserManager();
 
             // Assert
             Assert.That(registerService.GetLoginService(), Is.Not.Null);

@@ -85,7 +85,7 @@ namespace MTCG.Services
 
         private static bool IsSpellCard(Card card)
         {
-            return card.GetType().Name == CardType.SpellCard.ToString();
+            return card.GetType().Name == CardType.Spell.ToString();
         }
 
         private static int ReCalcDamage(Card leftPlayerCard, Card rightPlayerCard)

@@ -2,7 +2,8 @@
 {
     public class Wizzard : MonsterCard
     {
-        public Wizzard(int damage, string id) : base(typeof(Wizzard).ToString(), damage, ElementType.Normal, id)
+        public static readonly ElementType ElementType = ElementType.Normal;
+        public Wizzard(int damage, string id) : base(typeof(Wizzard).ToString(), damage, ElementType, id)
         {
 
         }

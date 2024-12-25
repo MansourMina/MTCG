@@ -2,7 +2,7 @@
 {
     public class SpellCard : Card
     {
-        public SpellCard(string name, int damage, ElementType elementType, string id) : base(name, damage, elementType, id)
+        public SpellCard(string name, int damage, ElementType elementType, string id) : base(name, damage, elementType, CardType.Spell, id)
         {
 
         }
