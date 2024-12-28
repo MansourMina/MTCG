@@ -123,3 +123,7 @@ Authorization: Bearer RoleTest-6f7102e5-cf18-40b0-a030-47dc504403c4
     "e85e3976-7c86-4d06-9a80-641c2019a79f",
     "1cb6ab86-bdb2-47e5-b6e4-68c5ab389334"
 ]
+
+### Get User Stats
+GET http://localhost:8000/stats HTTP/1.1
+Authorization: Bearer RoleTest-6f7102e5-cf18-40b0-a030-47dc504403c4

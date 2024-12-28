@@ -72,10 +72,10 @@ namespace MTCG.Services.HTTP
 
             // Deck
             Routes[new Route("/deck", "GET", AuthorizationTypes.LoggedIn)] = GetUserDeck;
-            Routes[new Route("/deck", "PUT", AuthorizationTypes.LoggedIn)] = UpdateDeck;
+            Routes[new Route("/deck", "PUT", AuthorizationTypes.LoggedIn)] = UpdateUserDeck;
 
-
-
+            // Statistic
+            Routes[new Route("/stats", "GET", AuthorizationTypes.LoggedIn)] = GetUserStats;
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -380,6 +380,13 @@ namespace MTCG.Services.HTTP
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Stack.Cards) };
         }
 
+        private ResponseFormat GetUserStats(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Statistic) };
+        }
+
+
         private ResponseFormat GetUserDeck(HttpRequest request)
         {
             User user = GetUserFromAuthRole(request.Authorization);
@@ -417,7 +424,7 @@ namespace MTCG.Services.HTTP
             return user;
         }
 
-        private ResponseFormat UpdateDeck(HttpRequest request)
+        private ResponseFormat UpdateUserDeck(HttpRequest request)
         {
             UserManager userManager = new UserManager();
 
