@@ -40,10 +40,12 @@ namespace MTCG.Services
         public Package? PopRandom()
         {
            List<Package> packages = _packageRepository.GetAll();
+
            if (packages.Count == 0) return null;
            Random rnd = new Random();
            Package package = packages[rnd.Next(packages.Count)];
-           _packageRepository.Delete(package.Id);
+            
+            _packageRepository.Delete(package.Id);
            return package;
         }
     }

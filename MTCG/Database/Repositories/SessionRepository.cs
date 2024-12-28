@@ -15,6 +15,7 @@ namespace MTCG.Database.Repositories
         private static readonly DataLayer _dal = DataLayer.Instance;
         public void Add(string userId, string token, DateTime expires_at)
         {
+            DeleteByUserId(userId);
             var commandText = """
                 INSERT INTO user_sessions (user_id, session_token, expires_at) VALUES (@user_id, @token, @expires_at)
                 """;
@@ -96,7 +97,7 @@ namespace MTCG.Database.Repositories
         {
             var commandText = """DELETE FROM user_sessions WHERE user_id = @userId""";
             using IDbCommand command = _dal.CreateCommand(commandText);
-            DataLayer.AddParameterWithValue(command, "@token", DbType.String, userId.Trim());
+            DataLayer.AddParameterWithValue(command, "@userId", DbType.String, userId.Trim());
             int rowsAffected = command.ExecuteNonQuery();
         }
     }

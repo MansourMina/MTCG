@@ -29,9 +29,9 @@ namespace MTCG.Database.Repositories
         {
             var commandText = """
             SELECT c.name as card_name, c.damage as damage, c.element_type as element_type, c.card_type as card_type, c.id as card_id, p.id as package_id 
-            from cards as c 
+            FROM cards as c 
             JOIN packages_cards as pc ON c.id = pc.card_id 
-            JOIN packages as p ON p.id = pc.package_id 
+            JOIN packages as p ON p.id = pc.package_id
             """;
 
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -41,13 +41,14 @@ namespace MTCG.Database.Repositories
             while (reader.Read())
             {
                 var card = new Card(
-                    reader.GetString(0),
-                    reader.GetInt32(1),
-                    Enum.Parse<ElementType>(reader.GetString(2)),
-                    Enum.Parse<CardType>(reader.GetString(3)),
-                    reader.GetString(4)
+                    reader.GetString(0), // card_name
+                    reader.GetInt32(1),  // damage
+                    Enum.Parse<ElementType>(reader.GetString(2)), // element_type
+                    Enum.Parse<CardType>(reader.GetString(3)),    // card_type
+                    reader.GetString(4)  // card_id
                 );
-                string packageId = reader.GetString(3);
+
+                string packageId = reader.GetString(5); // package_id (korrekter Index)
 
                 if (!packages.ContainsKey(packageId))
                 {
@@ -59,6 +60,7 @@ namespace MTCG.Database.Repositories
 
             return packages.Values.ToList();
         }
+
 
         public Card? Get(string id)
         {

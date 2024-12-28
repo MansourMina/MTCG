@@ -11,7 +11,7 @@ namespace MTCG.Models
         public string Id {  get;}
         public List<Card> Cards { get; }
 
-        public const int Capacity = 4;
+        public const int Capacity = 5;
 
         public const int Costs = 5;
         public Package(List<Card> cards, string id)

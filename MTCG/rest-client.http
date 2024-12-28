@@ -7,7 +7,7 @@ GET http://localhost:8000/users HTTP/1.1
 
 ### GET User by Username
 GET http://localhost:8000/users/RoleTest HTTP/1.1
-Authorization: Bearer RoleTest-4160b0eb-5217-4ffc-84ed-87ebfcc356f3
+Authorization: Bearer RoleTest-93cf1edb-2ba7-4fc3-bbf5-9fc7d5cfe7cd
 
 ### Register User
 POST http://localhost:8000/users HTTP/1.1
@@ -61,7 +61,7 @@ Authorization: Bearer RoleTest-ad553a85-ad38-411c-9e8e-3cf2fefa855cb89281327bf0
 ### Create Package
 POST http://localhost:8000/packages HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer admin-90d37ef2-796e-45a9-ba3e-9d2210040af3
+Authorization: Bearer admin-ecb82cd2-c7ae-43e4-9578-033a20b3415b
 
 [
   {
@@ -100,4 +100,8 @@ GET http://localhost:8000/packages?Id= HTTP/1.1
 ### Acquire Package
 POST http://localhost:8000/transactions/packages
 Content-Type: application/json
-Authorization: Bearer RoleTest-4160b0eb-5217-4ffc-84ed-87ebfcc356f3
+Authorization: Bearer RoleTest-93cf1edb-2ba7-4fc3-bbf5-9fc7d5cfe7cd
+
+### Get User Cards
+GET http://localhost:8000/cards HTTP/1.1
+Authorization: Bearer RoleTest-93cf1edb-2ba7-4fc3-bbf5-9fc7d5cfe7cd
