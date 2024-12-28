@@ -13,15 +13,16 @@ namespace MTCG.Database.Repositories
     {
         private static readonly DataLayer _dal = DataLayer.Instance;
 
-        public string Add(string stack_id)
+        public string Create(string stack_id, string user_id)
         {
             var commandText = """
-                INSERT INTO stacks(id)
-                VALUES (@stack_id)
+                INSERT INTO stacks(id, user_id)
+                VALUES (@stack_id, @user_id)
                 RETURNING id
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@stack_id", DbType.String, stack_id);
+            DataLayer.AddParameterWithValue(command, "@user_id", DbType.String, user_id);
             return command.ExecuteScalar() as string ?? "";
         }
 
@@ -30,7 +31,7 @@ namespace MTCG.Database.Repositories
             foreach (var card in cards)
             {
                 var commandText = """
-                INSERT INTO stack_cards(id, stack_id,card_id)
+                INSERT INTO stack_cards(id, stack_id, card_id)
                 VALUES (@id, @stack_id, @card_id)
                 """;
                 using IDbCommand command = _dal.CreateCommand(commandText);

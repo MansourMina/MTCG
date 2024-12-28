@@ -2,6 +2,6 @@
 {
     public interface IStatisticRepository
     {
-        string Add(string stack_id);
+        string Create(string stack_id, string user_id);
     }
 }

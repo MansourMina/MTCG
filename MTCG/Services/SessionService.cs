@@ -55,7 +55,6 @@ namespace MTCG.Services
         public string? GetSessionByUser(string userId)
         {
             string? token = _sessionRepository?.GetUserToken(userId);
-            if (_sessionRepository.TokenExists(userId) && string.IsNullOrEmpty(token)) RevokeSessionByUserId(token);
             return token;
         }
 

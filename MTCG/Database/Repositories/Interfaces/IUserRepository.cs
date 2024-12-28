@@ -4,7 +4,7 @@ namespace MTCG.Database.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        void Add(User user);
+        string Create(User user);
         int Delete(string username);
         User? GetByName(string username);
         List<User> GetAll();

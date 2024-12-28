@@ -10,11 +10,11 @@ namespace MTCG.Database.Repositories
     {
         private static readonly DataLayer _dal = DataLayer.Instance;
 
-        public void Add(User user)
+        public string Create(User user)
         {
             var commandText = """
-                INSERT INTO users(username, password, coins, elo, stack_id, deck_id, statistic_id)
-                VALUES (@username, @password, @coins, @elo, @stack_id, @deck_id, @statistic_id)
+                INSERT INTO users(username, password, coins, elo)
+                VALUES (@username, @password, @coins, @elo)
                 RETURNING id
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -22,17 +22,17 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@password", DbType.String, user.Password);
             DataLayer.AddParameterWithValue(command, "@coins", DbType.Int32, user.Coins);
             DataLayer.AddParameterWithValue(command, "@elo", DbType.Int32, user.Elo);
-            DataLayer.AddParameterWithValue(command, "@stack_id", DbType.String, user.Stack.Id);
-            DataLayer.AddParameterWithValue(command, "@deck_id", DbType.String, user.Deck.Id);
-            DataLayer.AddParameterWithValue(command, "@statistic_id", DbType.String, user.Statistic.Id);
-            command.ExecuteNonQuery();
+            return command.ExecuteScalar() as string ?? "";
         }
 
         public List<User> GetAll()
         {
             var commandText = """
-            SELECT username, password, role, coins, elo, id, stack_id, deck_id, statistic_id
-            FROM users
+            SELECT u.username, u.password, u.role, u.coins, u.elo, u.id, s.id as stack_id, d.id as deck_id, st.id as statistic_id
+            FROM users u
+            JOIN stacks s ON u.id = s.user_id
+            JOIN decks d ON u.id = d.user_id
+            JOIN statistics st ON u.id = st.user_id
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
 
@@ -56,7 +56,14 @@ namespace MTCG.Database.Repositories
 
         public User? GetByName(string username)
         {
-            var commandText = """SELECT username, password, role, coins, elo, id, stack_id, deck_id, statistic_id from users where username = @username""";
+            var commandText = """
+            SELECT u.username, u.password, u.role, u.coins, u.elo, u.id, s.id as stack_id, d.id as deck_id, st.id as statistic_id
+            FROM users u
+            JOIN stacks s ON u.id = s.user_id
+            JOIN decks d ON u.id = d.user_id
+            JOIN statistics st ON u.id = st.user_id
+            WHERE u.username = @username
+            """;
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username.Trim());
 
@@ -78,7 +85,14 @@ namespace MTCG.Database.Repositories
 
         public User? GetById(string userId)
         {
-            var commandText = """SELECT username, password, role, coins, elo, id, stack_id, deck_id, statistic_id from users where id = @id""";
+            var commandText = """
+            SELECT u.username, u.password, u.role, u.coins, u.elo, u.id, s.id as stack_id, d.id as deck_id, st.id as statistic_id
+            FROM users u
+            JOIN stacks s ON u.id = s.user_id
+            JOIN decks d ON u.id = d.user_id
+            JOIN statistics st ON u.id = st.user_id
+            WHERE u.id = @id
+            """;
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@id", DbType.String, userId.Trim());
 

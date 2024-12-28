@@ -27,6 +27,7 @@ namespace MTCG.Models
 
         private readonly UserRepository _userRepository;
         private readonly StackRepository _stackRepository;
+        private readonly DeckRepository _deckRepository;
 
         [JsonConstructor]
         private User() { }
@@ -35,6 +36,8 @@ namespace MTCG.Models
         {
             _setProperties(name, password);
             _userRepository = new UserRepository();
+            _deckRepository = new DeckRepository();
+            _stackRepository = new StackRepository();
 
         }
         public User(string name, string password, string role)
@@ -42,6 +45,8 @@ namespace MTCG.Models
             _setProperties(name, password);
             Role = role;
             _userRepository = new UserRepository();
+            _deckRepository = new DeckRepository();
+            _stackRepository = new StackRepository();
         }
 
         public User(string name, string password, string stack_id, string deck_id, string statistic_id)
@@ -51,12 +56,16 @@ namespace MTCG.Models
             Deck.SetId(deck_id);
             Statistic.SetId(statistic_id);
             _userRepository = new UserRepository();
+            _deckRepository = new DeckRepository();
+            _stackRepository = new StackRepository();
         }
 
-        public User(string name, string password, UserRepository userRepository)
+        public User(string name, string password, UserRepository userRepository, StackRepository stackRepository, DeckRepository deckRepository)
         {
             _setProperties(name, password);
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+            _stackRepository = stackRepository ?? throw new ArgumentNullException(nameof(stackRepository));
+            _deckRepository = deckRepository ?? throw new ArgumentNullException(nameof(deckRepository));
         }
 
         private void _setProperties(string name, string password)
@@ -129,23 +138,14 @@ namespace MTCG.Models
             Deck.Cards.Add(card);
         }
 
-        public void SetDeck()
-        {
-            Stack.Cards.Sort((x, y) => y.Damage.CompareTo(x.Damage));
-            int length = Deck.Cards.Capacity - Deck.Cards.Count;
-            for (int i = 0; i < length && i < Stack.Cards.Count; i++)
-            {
-                Deck.Cards.Add(Stack.Cards[i]);
-                Stack.Cards.Remove(Stack.Cards[i]);
-            }
-        }
-
         public void AcquirePackage(int costs, List<Card> cards)
         {
             Coins -= costs;
             Stack.Set(cards);
             _userRepository.UpdateUserCreds(Username, this);
         }
+
+        
 
     }
 }

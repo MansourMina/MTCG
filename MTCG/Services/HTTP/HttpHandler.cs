@@ -2,6 +2,7 @@
 using MTCG.Database.Repositories.Interfaces;
 using MTCG.Models;
 using MTCG.Presentation;
+using MTCG.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Data;
@@ -67,7 +68,13 @@ namespace MTCG.Services.HTTP
             Routes[new Route("/transactions/packages", "POST", AuthorizationTypes.LoggedIn)] = AcquirePackage;
 
             // Cards
-            Routes[new Route("/cards", "GET", AuthorizationTypes.LoggedIn)] = GetUserCards;
+            Routes[new Route("/cards", "GET", AuthorizationTypes.LoggedIn)] = GetUserStackCards;
+
+            // Deck
+            Routes[new Route("/deck", "GET", AuthorizationTypes.LoggedIn)] = GetUserDeck;
+            Routes[new Route("/deck", "PUT", AuthorizationTypes.LoggedIn)] = UpdateDeck;
+
+
 
         }
 
@@ -79,8 +86,8 @@ namespace MTCG.Services.HTTP
             if (request == null)
                 throw new ArgumentNullException(nameof(request), "Invalid request");
 
-
-            var clientRoute = new Route(request.Path, request.Method);
+            string fullPath = RemoveQueryFromPath(request.Path);
+            var clientRoute = new Route(fullPath, request.Method);
             var finalResponse = new ResponseFormat { Status = (int)HTTPStatusCode.NotFound, Body = "Path Not found" };
 
             var foundRoute = ContainsRoute(clientRoute);
@@ -274,7 +281,7 @@ namespace MTCG.Services.HTTP
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             var users = dbUser.GetAll();
             foreach (var user in users)
-                user.Stack.Set(dbCard.GetCards(user.Stack.Id));
+                user.Stack.Set(dbCard.GetStackCards(user.Stack.Id));
             response.Body = JsonSerializer.Serialize(users);
             return response;
         }
@@ -285,7 +292,7 @@ namespace MTCG.Services.HTTP
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             string username = request.PathVariables?["username"];
             User? user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
-            user.Stack.Set(dbCard.GetCards(user.Stack.Id));
+            user.Stack.Set(dbCard.GetStackCards(user.Stack.Id));
             response.Body = JsonSerializer.Serialize(user);
             return response;
         }
@@ -322,32 +329,23 @@ namespace MTCG.Services.HTTP
         private ResponseFormat GetPackages(HttpRequest request)
         {
             PackageRepository dbPackage = new();
-            ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
-            string? packageId = ExtractPath(request.Path ?? string.Empty);
-            if (packageId != null)
-            {
-                Card? package = dbPackage.Get(packageId) ?? throw new KeyNotFoundException($"Package '{packageId}' does not exist");
-                response.Body = JsonSerializer.Serialize(package);
-            }
-            else
-            {
-                var packages = dbPackage.GetAll();
-                response.Body = JsonSerializer.Serialize(packages);
-            }
-            return response;
-        }
+            var packages = dbPackage.GetAll();
+            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(packages) };
 
+        }
 
         private ResponseFormat AcquirePackage(HttpRequest request)
         {
             PackageService packageService = new();
             UserRepository userRepository = new();
             StackRepository stackRepository = new();
+            UserManager userManager = new UserManager();
+
 
             string? username = GetAuthorizationRole(request.Authorization);
 
             if (string.IsNullOrEmpty(username)) throw new ArgumentException("Failed to aqquire package");
-            User? user = userRepository.GetByName(username);
+            var user = userManager.GetUserByName(username);
             if (user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
             if (user.Coins < Package.Costs) throw new NotSupportedException("Not enough money");
 
@@ -368,27 +366,66 @@ namespace MTCG.Services.HTTP
                 throw new ArgumentException("Failed to update user");
 
             UserRepository dbUser = new();
-            var user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
+            UserManager userManager = new UserManager();
+            var user = userManager.GetUserByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
             ChangeUserProperties(user, body);
             dbUser.UpdateUserCreds(username, user);
 
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User updated successfully" };
         }
 
-        private ResponseFormat GetUserCards(HttpRequest request)
+        private ResponseFormat GetUserStackCards(HttpRequest request)
         {
-            UserRepository userRepository = new();
-            CardRepository cardRepository = new();
+            User user = GetUserFromAuthRole(request.Authorization);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Stack.Cards) };
+        }
 
-            string? username = GetAuthorizationRole(request.Authorization);
+        private ResponseFormat GetUserDeck(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+            string? format = ExtractQuery(request.Path ?? string.Empty, "format");
+            ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
+            if (string.IsNullOrEmpty(format))
+                response.Body = JsonSerializer.Serialize(user.Deck.Cards);
+            else
+            {
+                switch (format)
+                {
+                    case "plain":
+                        response.Body = string.Join(Environment.NewLine, user.Deck.Cards.Select(card => $"Card: {card.Name} (ID: {card.Id}), Damage: {card.Damage}, Element: {card.ElementType}, Type: {card.CardType}"));
+                        break;
+                    default:
+                        response.Status = (int)HTTPStatusCode.BadRequest;
+                        break;
 
-            if (string.IsNullOrEmpty(username)) throw new ArgumentException("Failed to get Cards");
+                }
+            }
+            return response;
 
-            User? user = userRepository.GetByName(username);
+    }
+
+    private User GetUserFromAuthRole(string authorization)
+        {
+            UserManager userManager = new UserManager();
+
+            string? username = GetAuthorizationRole(authorization);
+
+            if (string.IsNullOrEmpty(username)) throw new ArgumentException("Username cannot be empty");
+
+            User? user = userManager.GetUserByName(username);
             if (user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
+            return user;
+        }
 
-            List<Card> cards = cardRepository.GetCards(user.Stack.Id);
-            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = JsonSerializer.Serialize(cards) };
+        private ResponseFormat UpdateDeck(HttpRequest request)
+        {
+            UserManager userManager = new UserManager();
+
+            User user = GetUserFromAuthRole(request.Authorization);
+            var dDeck = JsonSerializer.Deserialize<List<string>>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to update Deck");
+            if (dDeck.Count < BattleService.DeckSize) throw new ArgumentException($"{BattleService.DeckSize} cards are required");
+            userManager.ConfigureUserDeck(dDeck, user);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Deck configured successfully" };
         }
         private static void ChangeUserProperties(User user, User body)
         {
@@ -433,20 +470,33 @@ namespace MTCG.Services.HTTP
             response.Send();
             Console.WriteLine("Body: " + response.Body);
         }
-        public static string? ExtractPath(string url)
+        public string? ExtractQuery(string url, string queryName)
         {
-            var uri = new Uri("http://dummy.com" + url);
-            var path = uri.AbsolutePath;
+            var uri = new Uri("http://dummy.com" + url); 
+            var queryParams = uri.Query.TrimStart('?'); 
 
-            // Entferne den führenden Slash
-            if (path.StartsWith("/"))
+            // Wenn es Query-Parameter gibt
+            if (!string.IsNullOrEmpty(queryParams))
             {
-                path = path.Substring(1);
+                var parameters = queryParams.Split('&'); // Parameter nach '&' trennen
+                foreach (var param in parameters)
+                {
+                    var keyValue = param.Split('='); // Schlüssel und Wert trennen
+                    if (keyValue.Length == 2 && keyValue[0] == queryName) 
+                    {
+                        return keyValue[1]; 
+                    }
+                }
             }
 
-            // Nimm das letzte Segment nach dem letzten '/'
-            var segments = path.Split('/');
-            return segments.Length > 1 ? segments[^1] : null;
+            return null; 
+        }
+
+        public static string RemoveQueryFromPath(string url)
+        {
+            var uri = new Uri("http://dummy.com" + url);
+            var pathWithoutQuery = uri.AbsolutePath;
+            return pathWithoutQuery;
         }
     }
 }

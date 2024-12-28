@@ -130,14 +130,14 @@ namespace MTCG.Services
             {
                 LeftPlayer.AddWin(WinningPoints);
                 RightPlayer.AddLosses(LosingPoints);
-                LeftPlayer.Deck.addCard(rightPlayerCard);
+                LeftPlayer.Deck.AddCard(rightPlayerCard);
                 RemoveCardFromPlayer(RightPlayer, rightPlayerCard);
             }
             else if (leftPlayerDamage < rightPlayerDamage)
             {
                 RightPlayer.AddWin(WinningPoints);
                 LeftPlayer.AddLosses(LosingPoints);
-                RightPlayer.Deck.addCard(leftPlayerCard);
+                RightPlayer.Deck.AddCard(leftPlayerCard);
                 RemoveCardFromPlayer(LeftPlayer, leftPlayerCard);
             }
             else
@@ -152,7 +152,7 @@ namespace MTCG.Services
             player.Deck.removeCard(card);
             Card? randomCard = player.Stack.popRandomCard();
             if (randomCard != null)
-                player.Deck.addCard(randomCard);
+                player.Deck.AddCard(randomCard);
         }
 
         public GameStatus CheckGameOver()

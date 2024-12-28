@@ -7,9 +7,8 @@ namespace MTCG.Models
         public List<Card> Cards { get; private set; }
         public string Id { get; private set; }
 
-        private readonly StackRepository _stackRepository;
 
-        public void addCard(Card card)
+        public void AddCard(Card card)
         {
             Cards.Add(card);
         }
@@ -17,7 +16,7 @@ namespace MTCG.Models
         public void Set(List<Card> cards)
         {
             for (int card = 0; card < cards.Count; card++)
-                addCard(cards[card]);
+                AddCard(cards[card]);
         }
 
         public Stack(string id)
@@ -40,7 +39,6 @@ namespace MTCG.Models
         public Card? popRandomCard()
         {
             if(Cards.Count == 0) return null;
-
             Random rnd = new Random();
             var card = Cards[rnd.Next(Cards.Count)];
             Cards.Remove(card);
