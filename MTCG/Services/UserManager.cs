@@ -9,7 +9,6 @@ namespace MTCG.Services
 {
     public class UserManager : IUserManager
     {
-        private readonly ILoginService _loginService;
         private readonly IUserRepository _userRepository;
         private readonly IDeckRepository _deckRepository;
         private readonly IStackRepository _stackRepository;
@@ -17,9 +16,8 @@ namespace MTCG.Services
         private readonly ICardRepository _cardRepository;
         private readonly ISessionRepository _sessionRepository;
 
-        public UserManager(ILoginService loginService, IUserRepository userRepository, IDeckRepository deckRepository, IStackRepository stackRepository, IStatisticRepository statisticRepository, ICardRepository cardRepository, ISessionRepository sessionRepository)
+        public UserManager(IUserRepository userRepository, IDeckRepository deckRepository, IStackRepository stackRepository, IStatisticRepository statisticRepository, ICardRepository cardRepository, ISessionRepository sessionRepository)
         {
-            _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _deckRepository = deckRepository ?? throw new ArgumentNullException(nameof(deckRepository));
             _stackRepository = stackRepository ?? throw new ArgumentNullException(nameof(stackRepository));
@@ -30,7 +28,6 @@ namespace MTCG.Services
 
         public UserManager()
         {
-            _loginService = new LoginService();
             _userRepository = new UserRepository();
             _cardRepository = new CardRepository();
             _deckRepository = new DeckRepository();
@@ -63,7 +60,6 @@ namespace MTCG.Services
 
         }
 
-        public ILoginService GetLoginService() => _loginService;
         public IUserRepository GetUserRepository() => _userRepository;
 
         public User GetUserByName(string username)
@@ -82,10 +78,9 @@ namespace MTCG.Services
             return user;
         }
 
-        public List<User>? GetAllUser()
+        public List<User> GetAllUser()
         {
             var users = _userRepository.GetAll();
-            if (users == null) return null;
             foreach(var user in users) SetUserData(user);
             return users;
         }
@@ -126,12 +121,14 @@ namespace MTCG.Services
                 if (user.Deck.Cards.Count >= user.Deck.Cards.Capacity)
                     throw new ArgumentException($"Deck capacity reached. {cards_added} new cards added.");
                 _deckRepository.AddCard(Guid.NewGuid().ToString(), card.Id, user.Deck.Id);
+                _stackRepository.RemoveCard(card.Id);
                 cards_added++;
             }
         }
 
         public void AcquirePackage(User user, int costs, List<Card> cards)
         {
+            if (user.Coins < Package.Costs) throw new NotSupportedException("Not enough money");
             user.DecCoins(costs);
             user.Stack.Set(cards);
             _userRepository.UpdateUserCreds(user.Username, user);
@@ -140,6 +137,17 @@ namespace MTCG.Services
         public void UpdateUserCreds(string username, User user)
         {
             _userRepository.UpdateUserCreds(username, user);
+        }
+
+        public bool HasCardInInventory(User user, string cardId)
+        {
+            List<Card> stack = _cardRepository.GetStackCards(user.Stack.Id);
+            List<Card> deck = _cardRepository.GetDeckCards(user.Deck.Id);
+
+            bool cardInStack = stack.Any(card => card.Id == cardId);
+            bool cardInDeck = deck.Any(card => card.Id == cardId);
+
+            return cardInStack || cardInDeck;
         }
 
     }

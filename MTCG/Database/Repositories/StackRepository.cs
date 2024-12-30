@@ -41,5 +41,14 @@ namespace MTCG.Database.Repositories
                 command.ExecuteNonQuery();
             }
         }
+
+        public int RemoveCard(string card_id)
+        {
+            var commandText = """DELETE from stack_cards where card_id = @card_id""";
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@card_id", DbType.String, card_id);
+            int rowsAffected = command.ExecuteNonQuery();
+            return rowsAffected;
+        }
     }
 }

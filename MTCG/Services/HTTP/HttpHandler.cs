@@ -6,6 +6,7 @@ using MTCG.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection.Metadata;
@@ -78,6 +79,13 @@ namespace MTCG.Services.HTTP
 
             // Statistic
             Routes[new Route("/stats", "GET", AuthorizationTypes.LoggedIn)] = GetUserStats;
+
+            // Scoreboard
+            Routes[new Route("/scoreboard", "GET", AuthorizationTypes.LoggedIn)] = GetUserScoreboard;
+
+            // Tradings
+            Routes[new Route("/tradings", "GET", AuthorizationTypes.LoggedIn)] = GetTrades;
+            Routes[new Route("/tradings", "POST", AuthorizationTypes.LoggedIn)] = CreateTrade;
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -87,7 +95,6 @@ namespace MTCG.Services.HTTP
 
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine($"{request.Method} {request.Path}");
-
 
             string fullPath = RemoveQueryFromPath(request.Path);
             var clientRoute = new Route(fullPath, request.Method);
@@ -204,15 +211,6 @@ namespace MTCG.Services.HTTP
 
         public void Authorize(Route clientRoute, Route foundRoute)
         {
-            Console.WriteLine("Token: " + clientRoute.Token);
-            Console.WriteLine("Type: " + clientRoute.AuthorizationType.ToString() ?? "");
-            Console.WriteLine("Role: " + clientRoute.Role ?? "");
-            Console.WriteLine("Username: " + (clientRoute.PathVariables.ContainsKey("username") == true ? clientRoute.PathVariables["username"]:""));
-
-            Console.WriteLine("Found-Token: " + foundRoute.Token ?? "");
-            Console.WriteLine("Found-Type: " + foundRoute.AuthorizationType.ToString() ?? "");
-            Console.WriteLine("Found-Role: " + foundRoute.Role ?? "");
-            Console.WriteLine("Found-Username: " + (foundRoute.PathVariables.ContainsKey("username") == true ? foundRoute.PathVariables["username"] : ""));
             if (foundRoute.AuthorizationType == AuthorizationTypes.All)
                 return;
 
@@ -283,8 +281,8 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat GetUsers(HttpRequest request)
         {
-            ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             var users = userManager.GetAllUser();
+            ResponseFormat response = new() { Status = users.Count == 0 ? (int)HTTPStatusCode.NoContent : (int)HTTPStatusCode.OK };
             response.Body = JsonSerializer.Serialize(users);
             return response;
         }
@@ -298,7 +296,6 @@ namespace MTCG.Services.HTTP
             response.Body = JsonSerializer.Serialize(user);
             return response;
         }
-
         private ResponseFormat DeleteUser(HttpRequest request)
         {
             if (string.IsNullOrEmpty(request.Path) || request.Path.Split('/').Length <= 2)
@@ -325,15 +322,13 @@ namespace MTCG.Services.HTTP
             packageService.Add(new Package(dPackage, Guid.NewGuid().ToString()));
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package created successfully" };
         }
-
         private ResponseFormat GetPackages(HttpRequest request)
         {
             PackageRepository dbPackage = new();
             var packages = dbPackage.GetAll();
-            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(packages) };
+            return new ResponseFormat { Status = packages.Count == 0 ? (int)HTTPStatusCode.NoContent : (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(packages) };
 
         }
-
         private ResponseFormat AcquirePackage(HttpRequest request)
         {
             PackageService packageService = new();
@@ -343,7 +338,6 @@ namespace MTCG.Services.HTTP
             if (string.IsNullOrEmpty(username)) throw new ArgumentException("Failed to aqquire package");
             var user = userManager.GetUserByName(username);
             if (user == null || string.IsNullOrEmpty(username)) throw new KeyNotFoundException($"User '{username}' does not exist");
-            if (user.Coins < Package.Costs) throw new NotSupportedException("Not enough money");
 
             Package? package = packageService.PopRandom();
             if (package == null) throw new KeyNotFoundException("No packages available");
@@ -370,7 +364,7 @@ namespace MTCG.Services.HTTP
         private ResponseFormat GetUserStackCards(HttpRequest request)
         {
             User user = GetUserFromAuthRole(request.Authorization);
-            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Stack.Cards) };
+            return new ResponseFormat { Status = user.Stack.Cards.Count == 0 ? (int)HTTPStatusCode.NoContent : (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Stack.Cards) };
         }
 
         private ResponseFormat GetUserStats(HttpRequest request)
@@ -379,12 +373,33 @@ namespace MTCG.Services.HTTP
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Statistic) };
         }
 
+        private ResponseFormat GetUserScoreboard(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Elo) };
+        }
+
+        private ResponseFormat GetTrades(HttpRequest request)
+        {
+            TradingService tradingService = new();
+            var trades = tradingService.GetAll();
+            return new ResponseFormat { Status = trades.Count == 0 ? (int)HTTPStatusCode.NoContent:(int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(trades)};
+        }
+        private ResponseFormat CreateTrade(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+            var dTrade = JsonSerializer.Deserialize<Trade>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to create a trade");
+
+            TradingService tradingService = new();
+            tradingService.CreateTrade(new Trade(dTrade.Card_Id, dTrade.Required_Card_Type, dTrade.Min_Damage, user.Id), user);
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Trade created successfully" };
+        }
 
         private ResponseFormat GetUserDeck(HttpRequest request)
         {
             User user = GetUserFromAuthRole(request.Authorization);
             string? format = ExtractQuery(request.Path ?? string.Empty, "format");
-            ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
+            ResponseFormat response = new() { Status = user.Deck.Cards.Count == 0 ? (int)HTTPStatusCode.NoContent : (int)HTTPStatusCode.OK };
             if (string.IsNullOrEmpty(format))
                 response.Body = JsonSerializer.Serialize(user.Deck.Cards);
             else
@@ -402,7 +417,7 @@ namespace MTCG.Services.HTTP
             }
             return response;
 
-    }
+        }
 
         private User GetUserFromAuthRole(string authorization)
         {
@@ -423,6 +438,7 @@ namespace MTCG.Services.HTTP
             userManager.ConfigureUserDeck(dDeck, user);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Deck configured successfully" };
         }
+
         private static void ChangeUserProperties(User user, User body)
         {
             bool propertiesChanged = false;
@@ -487,7 +503,6 @@ namespace MTCG.Services.HTTP
 
             return null; 
         }
-
         public static string RemoveQueryFromPath(string url)
         {
             var uri = new Uri("http://dummy.com" + url);
