@@ -6,6 +6,6 @@ namespace MTCG.Services.Interfaces
     {
         ILoginService GetLoginService();
         IUserRepository GetUserRepository();
-        void Register(string name, string password);
+        void Register(string name, string password, string role);
     }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MTCG.Database.Repositories
 {
-    public class SessionRepository
+    public class SessionRepository : ISessionRepository
     {
         private static readonly DataLayer _dal = DataLayer.Instance;
         public void Add(string userId, string token, DateTime expires_at)

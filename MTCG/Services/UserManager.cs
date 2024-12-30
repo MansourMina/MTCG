@@ -3,6 +3,7 @@ using MTCG.Database.Repositories;
 using MTCG.Database.Repositories.Interfaces;
 using MTCG.Models;
 using MTCG.Services.Interfaces;
+using System.Drawing;
 
 namespace MTCG.Services
 {
@@ -14,8 +15,9 @@ namespace MTCG.Services
         private readonly IStackRepository _stackRepository;
         private readonly IStatisticRepository _statisticRepository;
         private readonly ICardRepository _cardRepository;
+        private readonly ISessionRepository _sessionRepository;
 
-        public UserManager(ILoginService loginService, IUserRepository userRepository, IDeckRepository deckRepository, IStackRepository stackRepository, IStatisticRepository statisticRepository, ICardRepository cardRepository)
+        public UserManager(ILoginService loginService, IUserRepository userRepository, IDeckRepository deckRepository, IStackRepository stackRepository, IStatisticRepository statisticRepository, ICardRepository cardRepository, ISessionRepository sessionRepository)
         {
             _loginService = loginService ?? throw new ArgumentNullException(nameof(loginService));
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
@@ -23,6 +25,7 @@ namespace MTCG.Services
             _stackRepository = stackRepository ?? throw new ArgumentNullException(nameof(stackRepository));
             _cardRepository = cardRepository ?? throw new ArgumentNullException(nameof(cardRepository));
             _statisticRepository = statisticRepository ?? throw new ArgumentNullException(nameof(statisticRepository));
+            _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         }
 
         public UserManager()
@@ -33,16 +36,17 @@ namespace MTCG.Services
             _deckRepository = new DeckRepository();
             _stackRepository = new StackRepository();
             _statisticRepository = new StatisticRepository();
+            _sessionRepository = new SessionRepository();
         }
 
-        public void Register(string name, string password)
+        public void Register(string name, string password, string role)
         {
             var user = _userRepository?.GetByName(name.Trim());
             if (user != null) throw new InvalidOperationException("User already exists");
             if (string.IsNullOrWhiteSpace(name.Trim()) || string.IsNullOrWhiteSpace(password.Trim()))
                 throw new ArgumentException("Username or password cannot be empty.");
 
-            var newUser = new User(name, BCrypt.Net.BCrypt.EnhancedHashPassword(password));
+            var newUser = new User(name, BCrypt.Net.BCrypt.EnhancedHashPassword(password), role);
             string new_user_id = _userRepository?.Create(newUser);
 
             // Create Stack for User
@@ -65,11 +69,46 @@ namespace MTCG.Services
         public User GetUserByName(string username)
         {
             User user = _userRepository.GetByName(username.Trim());
+            if (user == null) return null;
+            SetUserData(user);
+            return user;
+        }
+
+        public User? GetUserById(string id)
+        {
+            User? user = _userRepository.GetById(id.Trim());
+            if(user == null) return null;
+            SetUserData(user);
+            return user;
+        }
+
+        public List<User>? GetAllUser()
+        {
+            var users = _userRepository.GetAll();
+            if (users == null) return null;
+            foreach(var user in users) SetUserData(user);
+            return users;
+        }
+
+        public int DeleteUser(string username)
+        {
+            return _userRepository.Delete(username);
+        }
+
+        public void AddCardsToUser(string stackId, List<Card> cards)
+        {
+            _stackRepository.AddCards(stackId, cards);
+        }
+
+        private void SetUserData(User user)
+        {
             List<Card> cards = _cardRepository.GetStackCards(user.Stack.Id);
             List<Card> deck = _cardRepository.GetDeckCards(user.Deck.Id);
+            string? token = _sessionRepository.GetUserToken(user.Id);
             user.Stack.Set(cards);
             user.Deck.Set(deck);
-            return user;
+            if(token != null)
+                user.SetToken(token);
         }
 
         public void ConfigureUserDeck(List<string> card_ids, User user)
@@ -90,5 +129,18 @@ namespace MTCG.Services
                 cards_added++;
             }
         }
+
+        public void AcquirePackage(User user, int costs, List<Card> cards)
+        {
+            user.DecCoins(costs);
+            user.Stack.Set(cards);
+            _userRepository.UpdateUserCreds(user.Username, user);
+        }
+
+        public void UpdateUserCreds(string username, User user)
+        {
+            _userRepository.UpdateUserCreds(username, user);
+        }
+
     }
 }

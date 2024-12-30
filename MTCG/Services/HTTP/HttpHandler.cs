@@ -32,6 +32,8 @@ namespace MTCG.Services.HTTP
             PaymentRequired = 402
         }
 
+        UserManager userManager = new();
+
 
         public struct ResponseFormat
         {
@@ -80,11 +82,12 @@ namespace MTCG.Services.HTTP
 
         private void Handle(HttpRequest request, HttpResponse response)
         {
-            Console.WriteLine("-------------------------------------------");
-            Console.WriteLine(request.Method + " " + request.Path);
-
             if (request == null)
                 throw new ArgumentNullException(nameof(request), "Invalid request");
+
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine($"{request.Method} {request.Path}");
+
 
             string fullPath = RemoveQueryFromPath(request.Path);
             var clientRoute = new Route(fullPath, request.Method);
@@ -98,16 +101,10 @@ namespace MTCG.Services.HTTP
 
             if (foundRoute != null)
             {
-                var (route, func) = foundRoute.Value;
-                if ((!IsAuthorized(clientRoute) || clientRoute.AuthorizationType != route.AuthorizationType) && route.AuthorizationType != AuthorizationTypes.All)
-                {
-                    finalResponse.Status = (int)HTTPStatusCode.Unauthorized;
-                    finalResponse.Body = "Unauthorized";
-                    SendResponse(response, finalResponse.Status, finalResponse.Body);
-                    return;
-                }
                 try
                 {
+                    var (route, func) = foundRoute.Value;
+                    Authorize(clientRoute, route);
                     var responseFormat = func(request);
                     finalResponse.Status = responseFormat.Status;
                     finalResponse.Body = responseFormat.Body;
@@ -205,39 +202,52 @@ namespace MTCG.Services.HTTP
             return parts[0];
         }
 
-
-        public bool IsAuthorized(Route request)
+        public void Authorize(Route clientRoute, Route foundRoute)
         {
-            if (request.AuthorizationType == AuthorizationTypes.All)
-                return true;
+            Console.WriteLine("Token: " + clientRoute.Token);
+            Console.WriteLine("Type: " + clientRoute.AuthorizationType.ToString() ?? "");
+            Console.WriteLine("Role: " + clientRoute.Role ?? "");
+            Console.WriteLine("Username: " + (clientRoute.PathVariables.ContainsKey("username") == true ? clientRoute.PathVariables["username"]:""));
 
-
-            if (request.Token == null || request.Holder == null)
-                return false;
+            Console.WriteLine("Found-Token: " + foundRoute.Token ?? "");
+            Console.WriteLine("Found-Type: " + foundRoute.AuthorizationType.ToString() ?? "");
+            Console.WriteLine("Found-Role: " + foundRoute.Role ?? "");
+            Console.WriteLine("Found-Username: " + (foundRoute.PathVariables.ContainsKey("username") == true ? foundRoute.PathVariables["username"] : ""));
+            if (foundRoute.AuthorizationType == AuthorizationTypes.All)
+                return;
 
             var sessionService = new SessionService();
-            string? userId = sessionService.GetUserIdByToken(request.Token);
+            var userId = sessionService.GetUserIdByToken(clientRoute.Token);
             if (string.IsNullOrEmpty(userId))
-                return false;
+                throw new UnauthorizedAccessException("Invalid Token");
 
-            var userRepository = new UserRepository();
-            User? sessionUser = userRepository.GetById(userId);
-            if (sessionUser == null)
-                return false;
+            var user = userManager.GetUserById(userId) ?? throw new KeyNotFoundException("User not found");
 
-            if (request.AuthorizationType == AuthorizationTypes.LoggedIn)
-                return true;
-            if (request.AuthorizationType == AuthorizationTypes.OwnUser)
+            switch (foundRoute.AuthorizationType)
             {
-                string username = request.PathVariables?["username"];
-                if (sessionUser.Username == request.Role && username == sessionUser.Username)
-                    return true;
-            }
-            // Normalerweise sessionUser.Role == request.Role. Aufgrund des TestScripts wird jedoch stattdessen der Username verwendet.
-            else if (request.AuthorizationType == AuthorizationTypes.Admin && sessionUser.Username == request.Role) return true;
-            return false;
-        }
+                case AuthorizationTypes.LoggedIn:
+                    return;
 
+                case AuthorizationTypes.OwnUser:
+                {
+                    if (clientRoute.PathVariables.ContainsKey("username"))
+                    {
+                        string username = clientRoute.PathVariables["username"];
+                        if (userManager.GetUserByName(username) == null)
+                            throw new KeyNotFoundException($"User '{username}' not found");
+                        if (username == user.Username && clientRoute.Role == user.Username)
+                            return;
+                    }
+                    throw new UnauthorizedAccessException("Access Denied");
+                }
+                case AuthorizationTypes.Admin:
+                    if (user.Role != clientRoute.Role)
+                        throw new UnauthorizedAccessException("Admin Access Required");
+                    return;
+                default:
+                    throw new UnauthorizedAccessException("Unknown Authorization Type");
+            }
+        }
 
         private (Route route, Func<HttpRequest, ResponseFormat> handler)? ContainsRoute(Route request)
         {
@@ -254,14 +264,11 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat RegisterUser(HttpRequest request)
         {
-            UserManager registerService = new();
-            StackRepository stackRepository = new();
-            DeckRepository deckRepository = new();
 
             var dUser = JsonSerializer.Deserialize<User>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to register user");
 
             // Create User
-            registerService.Register(dUser.Username, dUser.Password);
+            userManager.Register(dUser.Username, dUser.Password, dUser.Role);
 
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User created successfully" };
         }
@@ -276,23 +283,18 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat GetUsers(HttpRequest request)
         {
-            UserRepository dbUser = new();
-            CardRepository dbCard = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
-            var users = dbUser.GetAll();
-            foreach (var user in users)
-                user.Stack.Set(dbCard.GetStackCards(user.Stack.Id));
+            var users = userManager.GetAllUser();
             response.Body = JsonSerializer.Serialize(users);
             return response;
         }
         private ResponseFormat GetUser(HttpRequest request)
         {
-            UserRepository dbUser = new();
-            CardRepository dbCard = new();
             ResponseFormat response = new() { Status = (int)HTTPStatusCode.OK };
             string username = request.PathVariables?["username"];
-            User? user = dbUser.GetByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
-            user.Stack.Set(dbCard.GetStackCards(user.Stack.Id));
+            if(string.IsNullOrEmpty(username)) throw new ArgumentException($"Failed to get user");
+
+            User? user = userManager.GetUserByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
             response.Body = JsonSerializer.Serialize(user);
             return response;
         }
@@ -305,8 +307,7 @@ namespace MTCG.Services.HTTP
             string[] pathParts = request.Path.Split('/');
 
             string username = pathParts[2];
-            UserRepository dbUser = new();
-            int rowsAffected = dbUser.Delete(username);
+            int rowsAffected = userManager.DeleteUser(username);
             if (rowsAffected == 0)
                 throw new KeyNotFoundException($"User '{username}' does not exist");
             return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = "User deleted successfully" };
@@ -319,7 +320,6 @@ namespace MTCG.Services.HTTP
             {
                 card.SetElementType(card.Name);
                 card.SetCardType(card.Name);
-
             }
             PackageService packageService = new();
             packageService.Add(new Package(dPackage, Guid.NewGuid().ToString()));
@@ -337,10 +337,6 @@ namespace MTCG.Services.HTTP
         private ResponseFormat AcquirePackage(HttpRequest request)
         {
             PackageService packageService = new();
-            UserRepository userRepository = new();
-            StackRepository stackRepository = new();
-            UserManager userManager = new UserManager();
-
 
             string? username = GetAuthorizationRole(request.Authorization);
 
@@ -351,8 +347,8 @@ namespace MTCG.Services.HTTP
 
             Package? package = packageService.PopRandom();
             if (package == null) throw new KeyNotFoundException("No packages available");
-            user.AcquirePackage(Package.Costs, package.Cards);
-            stackRepository.AddCards(user.Stack.Id, package.Cards);
+            userManager.AcquirePackage(user, Package.Costs, package.Cards);
+            userManager.AddCardsToUser(user.Stack.Id, package.Cards);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package aqquired successfully" };
 
         }
@@ -365,12 +361,9 @@ namespace MTCG.Services.HTTP
             if (string.IsNullOrEmpty(request.Path) || request.PathVariables?.Count == 0 || body == null || string.IsNullOrEmpty(username))
                 throw new ArgumentException("Failed to update user");
 
-            UserRepository dbUser = new();
-            UserManager userManager = new UserManager();
             var user = userManager.GetUserByName(username) ?? throw new KeyNotFoundException($"User '{username}' does not exist");
             ChangeUserProperties(user, body);
-            dbUser.UpdateUserCreds(username, user);
-
+            userManager.UpdateUserCreds(username, user);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "User updated successfully" };
         }
 
@@ -411,10 +404,8 @@ namespace MTCG.Services.HTTP
 
     }
 
-    private User GetUserFromAuthRole(string authorization)
+        private User GetUserFromAuthRole(string authorization)
         {
-            UserManager userManager = new UserManager();
-
             string? username = GetAuthorizationRole(authorization);
 
             if (string.IsNullOrEmpty(username)) throw new ArgumentException("Username cannot be empty");
@@ -426,8 +417,6 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat UpdateUserDeck(HttpRequest request)
         {
-            UserManager userManager = new UserManager();
-
             User user = GetUserFromAuthRole(request.Authorization);
             var dDeck = JsonSerializer.Deserialize<List<string>>(request.Body.ToString()) ?? throw new ArgumentException($"Failed to update Deck");
             if (dDeck.Count < BattleService.DeckSize) throw new ArgumentException($"{BattleService.DeckSize} cards are required");

@@ -6,16 +6,17 @@ GET http://localhost:8000/ HTTP/1.1
 GET http://localhost:8000/users HTTP/1.1
 
 ### GET User by Username
-GET http://localhost:8000/users/RoleTest HTTP/1.1
-Authorization: Bearer RoleTest-890d30fd-af9d-4687-b84c-d365c4b74de9
+GET http://localhost:8000/users/admin HTTP/1.1
+Authorization: Bearer admin-bed3dc82-4ce0-45d3-893f-77ddde280395
 
 ### Register User
 POST http://localhost:8000/users HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"RoleTest", 
-    "Password":"Test1"
+    "Username":"test1", 
+    "Password":"Test1",
+    "Role": "user"
 }
 
 ### Register Admin
@@ -24,7 +25,8 @@ Content-Type: application/json
 
 {
     "Username":"admin", 
-    "Password":"Admin123"
+    "Password":"Admin123",
+    "Role":"admin"
 }
 
 ### Login User
@@ -50,9 +52,9 @@ DELETE http://localhost:8000/users/RoleTest HTTP/1.1
 Content-Type: application/json
 
 ### UPDATE User
-PUT http://localhost:8000/users/RoleTest HTTP/1.1
+PUT http://localhost:8000/users/admin HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer RoleTest-8fe02e53-909c-42be-a0d6-802fec47bf61
+Authorization: Bearer admin-bed3dc82-4ce0-45d3-893f-77ddde280395
 
 {
     "Coins": 5
@@ -61,7 +63,7 @@ Authorization: Bearer RoleTest-8fe02e53-909c-42be-a0d6-802fec47bf61
 ### Create Package
 POST http://localhost:8000/packages HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer admin-c2e6d3cc-3e8b-43c0-af9c-dbde545e2c50
+Authorization: Bearer admin-bed3dc82-4ce0-45d3-893f-77ddde280395
 
 [
   {
@@ -127,3 +129,5 @@ Authorization: Bearer RoleTest-6f7102e5-cf18-40b0-a030-47dc504403c4
 ### Get User Stats
 GET http://localhost:8000/stats HTTP/1.1
 Authorization: Bearer RoleTest-6f7102e5-cf18-40b0-a030-47dc504403c4
+
+

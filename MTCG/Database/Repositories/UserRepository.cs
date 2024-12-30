@@ -13,8 +13,8 @@ namespace MTCG.Database.Repositories
         public string Create(User user)
         {
             var commandText = """
-                INSERT INTO users(username, password, coins, elo)
-                VALUES (@username, @password, @coins, @elo)
+                INSERT INTO users(username, password, coins, elo, role)
+                VALUES (@username, @password, @coins, @elo, @role)
                 RETURNING id
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -22,6 +22,8 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@password", DbType.String, user.Password);
             DataLayer.AddParameterWithValue(command, "@coins", DbType.Int32, user.Coins);
             DataLayer.AddParameterWithValue(command, "@elo", DbType.Int32, user.Elo);
+            DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
+
             return command.ExecuteScalar() as string ?? "";
         }
 
