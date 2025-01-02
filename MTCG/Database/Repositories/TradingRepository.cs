@@ -55,5 +55,29 @@ namespace MTCG.Database.Repositories
             }
             return trades;
         }
+
+        public Trade? Get(string tradeID)
+        {
+            var commandText = """
+            SELECT id, card_to_trade_id, created_by_id, required_card_type, min_damage, status from trading_deals where id = @tradeID;
+            """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@tradeID", DbType.String, tradeID.Trim());
+
+            using IDataReader reader = command.ExecuteReader();
+            Trade? trade = null;
+            if (reader.Read())
+            {
+                trade = new Trade(
+                    reader.GetString(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetInt32(4),
+                    Enum.Parse<TradeStatus>(reader.GetString(5))
+                );
+            }
+            return trade;
+        }
     }
 }

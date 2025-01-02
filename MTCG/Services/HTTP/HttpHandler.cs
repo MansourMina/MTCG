@@ -86,6 +86,8 @@ namespace MTCG.Services.HTTP
             // Tradings
             Routes[new Route("/tradings", "GET", AuthorizationTypes.LoggedIn)] = GetTrades;
             Routes[new Route("/tradings", "POST", AuthorizationTypes.LoggedIn)] = CreateTrade;
+            Routes[new Route("/tradings/{tradingID}", "POST", AuthorizationTypes.LoggedIn)] = TradeCard;
+
         }
 
         private void Handle(HttpRequest request, HttpResponse response)
@@ -342,7 +344,7 @@ namespace MTCG.Services.HTTP
             Package? package = packageService.PopRandom();
             if (package == null) throw new KeyNotFoundException("No packages available");
             userManager.AcquirePackage(user, Package.Costs, package.Cards);
-            userManager.AddCardsToUser(user.Stack.Id, package.Cards);
+            userManager.AddCardsToStack(user.Stack.Id, package.Cards);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Package aqquired successfully" };
 
         }
@@ -393,6 +395,19 @@ namespace MTCG.Services.HTTP
             TradingService tradingService = new();
             tradingService.CreateTrade(new Trade(dTrade.Card_Id, dTrade.Required_Card_Type, dTrade.Min_Damage, user.Id), user);
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Trade created successfully" };
+        }
+
+        private ResponseFormat TradeCard(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+            string? tradeId = request.PathVariables?["tradingID"];
+            var dCardId = JsonSerializer.Deserialize<string>(request.Body.ToString());
+            if (string.IsNullOrEmpty(tradeId) || string.IsNullOrEmpty(dCardId)) throw new ArgumentException($"Failed to trade");
+
+            TradingService tradingService = new();
+            tradingService.Trade(tradeId, user, dCardId);
+
+            return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Trade completed successfully" };
         }
 
         private ResponseFormat GetUserDeck(HttpRequest request)

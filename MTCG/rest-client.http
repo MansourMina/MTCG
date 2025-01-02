@@ -6,8 +6,8 @@ GET http://localhost:8000/ HTTP/1.1
 GET http://localhost:8000/users HTTP/1.1
 
 ### GET User by Username
-GET http://localhost:8000/users/RoleTest HTTP/1.1
-Authorization: Bearer RoleTest-5ec7cc73-6f0e-41a1-a3f0-435c2f910d1d
+GET http://localhost:8000/users/admin2 HTTP/1.1
+Authorization: Bearer admin2-51d3c791-4e2a-4d57-ac7f-a704f5249e5a
 
 ### Register User
 POST http://localhost:8000/users HTTP/1.1
@@ -24,7 +24,7 @@ POST http://localhost:8000/users HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"admin", 
+    "Username":"admin2", 
     "Password":"Admin123",
     "Role":"admin"
 }
@@ -43,7 +43,7 @@ POST http://localhost:8000/sessions HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"admin",
+    "Username":"admin2",
     "Password":"Admin123"
 }
 
@@ -145,9 +145,16 @@ Content-Type: application/json
 Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
 
 {
-    "Card_Id": "dsadsdasda", 
+    "Card_Id": "99f8f8dc-e25e-4a95-aa2c-782823f36e2a", 
     "Required_Card_Type ": "WaterGoblin", 
     "Min_Damage": 10
 }
+
+### Trade Card
+POST http://localhost:8000/tradings/6cd85277-4590-49d4-b0cf-ba0a921faad0 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer RoleTest-8efff682-a449-4a15-9616-88686b346ef4
+
+"4ec8b269-0dfa-4f97-809a-2c63fe2a0025"
 
 

@@ -90,10 +90,33 @@ namespace MTCG.Services
             return _userRepository.Delete(username);
         }
 
-        public void AddCardsToUser(string stackId, List<Card> cards)
+        public void AddCardsToStack(string stackId, List<Card> cards)
         {
             _stackRepository.AddCards(stackId, cards);
         }
+
+        public void AddCardToStack(User user, Card card)
+        {
+            _stackRepository.AddCard(user.Stack.Id, card);
+        }
+
+        public void AddCardToDeck(User user, Card card)
+        {
+            _deckRepository.AddCard(card.Id, user.Deck.Id);
+        }
+        public void AddCardToUser(User user, Card card)
+        {
+            _stackRepository.AddCard(user.Stack.Id, card);
+        }
+
+        public void RemoveCardFromUser(User user, Card card)
+        {
+            if (HasCardInStack(user, card.Id))
+                _stackRepository.Remove(user.Stack.Id, card.Id);
+            else if (HasCardInDeck(user, card.Id))
+                _deckRepository.Remove(user.Deck.Id, card.Id);
+        }
+
 
         private void SetUserData(User user)
         {
@@ -120,8 +143,8 @@ namespace MTCG.Services
             {
                 if (user.Deck.Cards.Count >= user.Deck.Cards.Capacity)
                     throw new ArgumentException($"Deck capacity reached. {cards_added} new cards added.");
-                _deckRepository.AddCard(Guid.NewGuid().ToString(), card.Id, user.Deck.Id);
-                _stackRepository.RemoveCard(card.Id);
+                _deckRepository.AddCard(card.Id, user.Deck.Id);
+                _stackRepository.Remove(card.Id, user.Stack.Id);
                 cards_added++;
             }
         }
@@ -141,13 +164,19 @@ namespace MTCG.Services
 
         public bool HasCardInInventory(User user, string cardId)
         {
+            return HasCardInStack(user, cardId) || HasCardInDeck(user, cardId);
+        }
+
+        public bool HasCardInStack(User user, string cardId)
+        {
             List<Card> stack = _cardRepository.GetStackCards(user.Stack.Id);
+            return stack.Any(card => card.Id == cardId);
+        }
+
+        public bool HasCardInDeck(User user, string cardId)
+        {
             List<Card> deck = _cardRepository.GetDeckCards(user.Deck.Id);
-
-            bool cardInStack = stack.Any(card => card.Id == cardId);
-            bool cardInDeck = deck.Any(card => card.Id == cardId);
-
-            return cardInStack || cardInDeck;
+            return deck.Any(card => card.Id == cardId);
         }
 
     }

@@ -6,5 +6,7 @@ namespace MTCG.Database.Repositories.Interfaces
     {
         string Create(string id, string card_to_trade, string status, string created_by_id, string required_card_type, int min_damage);
         List<Trade> GetAll();
+
+        Trade? Get(string tradeID);
     }
 }

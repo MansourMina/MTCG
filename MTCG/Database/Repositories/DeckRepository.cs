@@ -26,17 +26,27 @@ namespace MTCG.Database.Repositories
             return command.ExecuteScalar() as string ?? "";
         }
 
-        public void AddCard(string id, string card_id, string deck_id)
+        public void AddCard(string card_id, string deck_id)
         {
             var commandText = """
                 INSERT INTO deck_cards(id, deck_id, card_id)
                 VALUES (@id, @deck_id, @card_id)
                 """;
             using IDbCommand command = _dal.CreateCommand(commandText);
-            DataLayer.AddParameterWithValue(command, "@id", DbType.String, id);
+            DataLayer.AddParameterWithValue(command, "@id", DbType.String, Guid.NewGuid().ToString());
             DataLayer.AddParameterWithValue(command, "@deck_id", DbType.String, deck_id);
             DataLayer.AddParameterWithValue(command, "@card_id", DbType.String, card_id);
             command.ExecuteNonQuery();
+        }
+
+        public int Remove(string card_id, string deck_id)
+        {
+            var commandText = """DELETE from decks_cards where card_id = @card_id AND deck_id = @deck_id""";
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@card_id", DbType.String, card_id);
+            DataLayer.AddParameterWithValue(command, "@deck_id", DbType.String, deck_id);
+            int rowsAffected = command.ExecuteNonQuery();
+            return rowsAffected;
         }
 
     }
