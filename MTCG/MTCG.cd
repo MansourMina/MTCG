@@ -3,7 +3,7 @@
   <Class Name="MTCG.Models.Cards.MonsterCards.Dragon">
     <Position X="0.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Cards\MonsterCards\Dragon.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -17,7 +17,7 @@
   <Class Name="MTCG.Models.Cards.MonsterCards.Goblin">
     <Position X="2.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Cards\MonsterCards\Goblin.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -31,7 +31,7 @@
   <Class Name="MTCG.Models.Cards.MonsterCards.Kraken">
     <Position X="2.25" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Cards\MonsterCards\Kraken.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -45,21 +45,21 @@
   <Class Name="MTCG.Models.Cards.MonsterCards.Wizzard">
     <Position X="0.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Cards\MonsterCards\Wizzard.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.Card">
     <Position X="3.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACBACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AIACBACAAAAAAAAAAAAAAAQAAAgAQAAAAAEAAgAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.Deck">
     <Position X="8.25" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAQAAAAAAAAAACA=</HashCode>
+      <HashCode>AAACIAAAAAAAJAAAAABACAAIAAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Deck.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -80,28 +80,21 @@
   <Class Name="MTCG.Models.Stack">
     <Position X="8.25" Y="8" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAAAAAAIAAAAAAQAAAAAAAgAACA=</HashCode>
+      <HashCode>AAACIAAAAAAAJAAAAAAAAAAIAAAAAAQACAAAAAAAAAA=</HashCode>
       <FileName>Models\Stack.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="MTCG.Models.Statistic">
-    <Position X="4.75" Y="7.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAQAAgAAAAAAAEAAAEAAAAAAAgAAAAAAAAAAA=</HashCode>
-      <FileName>Models\Statistic.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Models.User">
     <Position X="6.5" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>ABAAgCgAAgAAgAQAAwAECAAAoAIABAACEAhIAAABAAA=</HashCode>
+      <HashCode>ABACgIggAgAAoAAAEwAgCAAAgAIAAQACEAhYAAEBAAA=</HashCode>
       <FileName>Models\User.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Services.HTTP.HttpRequest">
     <Position X="16.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAAAABAAAEAAAAIAIAAhAAAACAAAAAAAIgAAAAAAAAA=</HashCode>
+      <HashCode>IAAAABAAAEAAAAIAIAAhAAAACAAAAAIAIgAAAAAAAAA=</HashCode>
       <FileName>Services\HTTP\HttpRequest.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -115,7 +108,7 @@
   <Class Name="MTCG.Services.HTTP.Server">
     <Position X="14.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAAACAAAAAAQACAAAAACAAAAAAAAAgAAAAAAAA=</HashCode>
+      <HashCode>AhAAAAAAACAAAAAgQACAAAAACAAAAAAAAAgAAAAAAAA=</HashCode>
       <FileName>Services\HTTP\Server.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -134,14 +127,14 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAIAgIAADAAAkAAEAAICCAAAEAAAQAEAAAAAAAAAEA=</HashCode>
+      <HashCode>AAAIBgIAEDAAAkAAEAAICCAAAEAAAQAEAAAAAAAAAEA=</HashCode>
       <FileName>Services\BattleService.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="MTCG.Services.LoginService">
     <Position X="15.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAEgAAAAAAAAAAEEAAIAAAQAAAAAAAAQAAAAAAA=</HashCode>
+      <HashCode>AAAAAAEgAAAAEAAAAAAAAAIAAAAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Services\LoginService.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -149,7 +142,7 @@
   <Class Name="MTCG.Services.PackageService" Collapsed="true">
     <Position X="11.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAACAAAAAAAACAAAAAAAA=</HashCode>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAACACAAAAAAAACAAAAAAAA=</HashCode>
       <FileName>Services\PackageService.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -176,8 +169,15 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EAAAABAAAEAAABgEAEAAAAACCQAAACIAEAAACAABAAA=</HashCode>
+      <HashCode>McgAARIBAEAAAVgEAEIATAACAQAAECIAEACgCCABAAA=</HashCode>
       <FileName>Services\HTTP\HttpHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MTCG.Models.Statistic">
+    <Position X="4.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACACAAQAAgIAQAAAAAAAAAAAAABAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Statistic.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Enum Name="MTCG.Models.ElementType">
@@ -190,7 +190,7 @@
   <Enum Name="MTCG.Models.CardType">
     <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAgAAAAAAAAA=</HashCode>
       <FileName>Models\Card.cs</FileName>
     </TypeIdentifier>
   </Enum>

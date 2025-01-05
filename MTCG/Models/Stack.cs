@@ -36,7 +36,7 @@ namespace MTCG.Models
             Cards.Remove(card);
         }
 
-        public Card? popRandomCard()
+        public Card? PopRandomCard()
         {
             if(Cards.Count == 0) return null;
             Random rnd = new Random();

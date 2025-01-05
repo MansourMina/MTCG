@@ -98,11 +98,16 @@ namespace MTCG.Services
         public void AddCardToStack(User user, Card card)
         {
             _stackRepository.AddCard(user.Stack.Id, card);
+            user.Stack.AddCard(card);
         }
 
         public void AddCardToDeck(User user, Card card)
         {
-            _deckRepository.AddCard(card.Id, user.Deck.Id);
+            if(user.Deck.Cards.Count < user.Deck.Cards.Capacity)
+            {
+                _deckRepository.AddCard(card.Id, user.Deck.Id);
+                user.Deck.AddCard(card);
+            }
         }
         public void AddCardToUser(User user, Card card)
         {
@@ -112,9 +117,9 @@ namespace MTCG.Services
         public void RemoveCardFromUser(User user, Card card)
         {
             if (HasCardInStack(user, card.Id))
-                _stackRepository.Remove(user.Stack.Id, card.Id);
+                RemoveCardFromStack(user, card);
             else if (HasCardInDeck(user, card.Id))
-                _deckRepository.Remove(user.Deck.Id, card.Id);
+                RemoveCardFromDeck(user, card);
         }
 
 
@@ -123,10 +128,13 @@ namespace MTCG.Services
             List<Card> cards = _cardRepository.GetStackCards(user.Stack.Id);
             List<Card> deck = _cardRepository.GetDeckCards(user.Deck.Id);
             string? token = _sessionRepository.GetUserToken(user.Id);
+            Statistic? statistic = _statisticRepository.GetByUserId(user.Id);
             user.Stack.Set(cards);
             user.Deck.Set(deck);
             if(token != null)
                 user.SetToken(token);
+            if (statistic != null)
+                user.SetStatistic(statistic);
         }
 
         public void ConfigureUserDeck(List<string> card_ids, User user)
@@ -169,15 +177,73 @@ namespace MTCG.Services
 
         public bool HasCardInStack(User user, string cardId)
         {
-            List<Card> stack = _cardRepository.GetStackCards(user.Stack.Id);
-            return stack.Any(card => card.Id == cardId);
+            return user.Stack.Cards.Any(card => card.Id == cardId);
         }
 
         public bool HasCardInDeck(User user, string cardId)
         {
-            List<Card> deck = _cardRepository.GetDeckCards(user.Deck.Id);
-            return deck.Any(card => card.Id == cardId);
+            return user.Deck.Cards.Any(card => card.Id == cardId);
         }
 
+        public Card? GetCard(User user, string cardId)
+        {
+            foreach (var card in user.Deck.Cards)
+            {
+                if (card.Id == cardId)
+                    return card;
+            }
+
+            return null;
+        }
+
+        public void AddWinToUser(User user)
+        {
+            user.Statistic.AddWin();
+            _statisticRepository.Update(user.Statistic);
+        }
+
+
+        public void IncEloUser(User user, int points)
+        {
+            user.IncElo(points);
+            _userRepository.UpdateUserCreds(user.Username, user);
+        }
+
+        public void DecEloUser(User user, int points)
+        {
+            user.DecElo(points);
+            _userRepository.UpdateUserCreds(user.Username, user);
+        }
+        public void AddLossesToUser(User user)
+        {
+            user.Statistic.AddLosses();
+            _statisticRepository.Update(user.Statistic);
+        }
+
+        public void RemoveCardFromDeck(User user, Card card)
+        {
+            _deckRepository.Remove(user.Deck.Id, card.Id);
+            user.Deck.removeCard(card);
+        }
+
+        public void RemoveCardFromStack(User user, Card card)
+        {
+            _stackRepository.Remove(user.Stack.Id, card.Id);
+            user.Stack.removeCard(card);
+        }
+
+        public void AddDrawToUser(User user)
+        {
+            user.Statistic.AddDraw();
+            _statisticRepository.Update(user.Statistic);
+        }
+
+        public Card? PopRandomCardFromStack(User user)
+        {
+            Card? card = user.Stack.PopRandomCard();
+            if (card == null) return null;
+            _stackRepository.Remove(user.Stack.Id, card.Id);
+            return card;
+        }
     }
 }

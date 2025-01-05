@@ -34,7 +34,7 @@ namespace MTCG.Services.HTTP
         }
 
         UserManager userManager = new();
-
+        private static readonly BattleQueueService battleQueueService = new BattleQueueService();
 
         public struct ResponseFormat
         {
@@ -87,6 +87,11 @@ namespace MTCG.Services.HTTP
             Routes[new Route("/tradings", "GET", AuthorizationTypes.LoggedIn)] = GetTrades;
             Routes[new Route("/tradings", "POST", AuthorizationTypes.LoggedIn)] = CreateTrade;
             Routes[new Route("/tradings/{tradingID}", "POST", AuthorizationTypes.LoggedIn)] = TradeCard;
+            Routes[new Route("/tradings/{tradingID}", "DELETE", AuthorizationTypes.LoggedIn)] = DeleteTrade;
+
+            // Battle
+            Routes[new Route("/battles", "POST", AuthorizationTypes.LoggedIn)] = Battle;
+
 
         }
 
@@ -377,8 +382,11 @@ namespace MTCG.Services.HTTP
 
         private ResponseFormat GetUserScoreboard(HttpRequest request)
         {
-            User user = GetUserFromAuthRole(request.Authorization);
-            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(user.Elo) };
+            var users = userManager.GetAllUser();
+            var userEloInfo = new List<object>();
+            foreach (var user in users)
+                userEloInfo.Add(new { user.Username, user.Elo });
+            return new ResponseFormat { Status = (int)HTTPStatusCode.OK, Body = JsonSerializer.Serialize(userEloInfo) };
         }
 
         private ResponseFormat GetTrades(HttpRequest request)
@@ -410,6 +418,18 @@ namespace MTCG.Services.HTTP
             return new ResponseFormat { Status = (int)HTTPStatusCode.Created, Body = "Trade completed successfully" };
         }
 
+        private ResponseFormat DeleteTrade(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+            string? tradeId = request.PathVariables?["tradingID"];
+            if (string.IsNullOrEmpty(tradeId)) throw new ArgumentException($"Failed to delete the trade");
+
+            TradingService tradingService = new();
+            tradingService.Delete(tradeId, user);
+
+            return new ResponseFormat { Status = (int)HTTPStatusCode.NoContent, Body = "Trade deleted successfully" };
+        }
+
         private ResponseFormat GetUserDeck(HttpRequest request)
         {
             User user = GetUserFromAuthRole(request.Authorization);
@@ -433,6 +453,46 @@ namespace MTCG.Services.HTTP
             return response;
 
         }
+
+        private ResponseFormat Battle(HttpRequest request)
+        {
+            User user = GetUserFromAuthRole(request.Authorization);
+
+            // Versuche, den Spieler in die Warteschlange einzureihen
+            if (!battleQueueService.TryEnqueue(user))
+                throw new InvalidOperationException("User is already waiting for an opponent");
+
+            // Prüfe, ob ein Gegner in der Warteschlange ist
+            if (battleQueueService.HasOpponent())
+            {
+                User? opponent = battleQueueService.TryDequeue();
+                if (opponent == user)
+                    throw new InvalidOperationException("Matching failed. Please try again.");
+
+                Console.WriteLine($"Match found: {user.Username} vs {opponent.Username}");
+
+                // Starte das Battle
+                Task.Run(() =>
+                {
+                    var battleService = new BattleService(user, opponent);
+                    battleService.Start();
+                });
+
+                return new ResponseFormat
+                {
+                    Status = (int)HTTPStatusCode.OK,
+                    Body = $"Match found between {user.Username} and {opponent.Username}. Battle started!"
+                };
+            }
+
+            // Waiting
+            return new ResponseFormat
+            {
+                Status = (int)HTTPStatusCode.OK,
+                Body = $"User {user.Username} entered the battle queue. Waiting for an opponent..."
+            };
+        }
+
 
         private User GetUserFromAuthRole(string authorization)
         {

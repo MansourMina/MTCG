@@ -33,7 +33,7 @@ namespace MTCG.Database.Repositories
         public List<Trade> GetAll()
         {
             var commandText = """
-            SELECT id, card_to_trade_id, created_by_id, required_card_type, min_damage, status from trading_deals;
+            SELECT id, card_to_trade_id, created_by_id, required_card_type, min_damage, status from trading_deals WHERE status = 'Listed';
             """;
 
             using IDbCommand command = _dal.CreateCommand(commandText);
@@ -56,13 +56,13 @@ namespace MTCG.Database.Repositories
             return trades;
         }
 
-        public Trade? Get(string tradeID)
+        public Trade? GetTradeFromCardId(string cardID)
         {
             var commandText = """
-            SELECT id, card_to_trade_id, created_by_id, required_card_type, min_damage, status from trading_deals where id = @tradeID;
+            SELECT id, card_to_trade_id, created_by_id, required_card_type, min_damage, status from trading_deals where card_to_trade_id = @cardID AND status = 'Listed';
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
-            DataLayer.AddParameterWithValue(command, "@tradeID", DbType.String, tradeID.Trim());
+            DataLayer.AddParameterWithValue(command, "@cardID", DbType.String, cardID.Trim());
 
             using IDataReader reader = command.ExecuteReader();
             Trade? trade = null;
@@ -78,6 +78,55 @@ namespace MTCG.Database.Repositories
                 );
             }
             return trade;
+        }
+
+        public Trade? GetTradeFromCardIdOfUser(string cardID, string userId)
+        {
+            var commandText = """
+            SELECT id, card_to_trade_id, created_by_id, required_card_type, min_damage, status from trading_deals where card_to_trade_id = @cardID AND created_by_id=@userId AND status = 'Listed';
+            """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@cardID", DbType.String, cardID.Trim());
+            DataLayer.AddParameterWithValue(command, "@userId", DbType.String, userId.Trim());
+
+            using IDataReader reader = command.ExecuteReader();
+            Trade? trade = null;
+            if (reader.Read())
+            {
+                trade = new Trade(
+                    reader.GetString(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetInt32(4),
+                    Enum.Parse<TradeStatus>(reader.GetString(5))
+                );
+            }
+            return trade;
+        }
+
+        public void Traded(string tradeID, TradeStatus status)
+        {
+            var commandText = """
+            UPDATE trading_deals 
+            SET status = @status
+            WHERE id = @tradeID
+            """;
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@status", DbType.String, status.ToString());
+            DataLayer.AddParameterWithValue(command, "@tradeID", DbType.String, tradeID);
+            command.ExecuteNonQuery();
+        }
+
+
+        public int Delete(string tradeId, string userId)
+        {
+            var commandText = """DELETE from trading_deals where card_to_trade_id= @tradeId AND created_by_id=@userId""";
+            using IDbCommand command = _dal.CreateCommand(commandText);
+            DataLayer.AddParameterWithValue(command, "@tradeId", DbType.String, tradeId.Trim());
+            DataLayer.AddParameterWithValue(command, "@userId", DbType.String, userId.Trim());
+            int rowsAffected = command.ExecuteNonQuery();
+            return rowsAffected;
         }
     }
 }

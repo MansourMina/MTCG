@@ -30,7 +30,8 @@ namespace MTCG.Services
         {
             var user = _userRepository?.GetByName(name.Trim());
             if (user == null || !BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password))
-                throw new UnauthorizedAccessException("Invalid username or password");
+                throw new 
+                    UnauthorizedAccessException("Invalid username or password");
             return _sessionService.GetSessionByUser(user.Id) ?? _sessionService.CreateSession(user.Id);
         }
 

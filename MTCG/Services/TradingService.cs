@@ -41,36 +41,45 @@ namespace MTCG.Services
             _tradingRepository.Create(trade.Id, trade.Card_Id, trade.Status.ToString(), trade.Created_By_Id, trade.Required_Card_Type.ToString(), trade.Min_Damage);
         }
 
-        public void Trade(string tradeId, User tradingUser, string offeredCardId)
+        public void Trade(string tradeCardId, User offeringUser, string offeredCardId)
         {
-            Trade? trade = _tradingRepository.Get(tradeId);
+            Trade? trade = _tradingRepository.GetTradeFromCardId(tradeCardId);
             if (trade == null )
                 throw new KeyNotFoundException("Trade not found");
-            if(trade.Created_By_Id == tradingUser.Id)
+            if(trade.Created_By_Id == offeringUser.Id)
                 throw new DuplicateNameException("Cannot trade with yourself");
 
-            if (!_userManager.HasCardInInventory(tradingUser, offeredCardId))
+            if (!_userManager.HasCardInInventory(offeringUser, offeredCardId))
                 throw new KeyNotFoundException("Offered card not found in user's inventory");
 
-            Card offeredCard = _packageRepository.Get(offeredCardId)!;
-            Card tradeCard = _packageRepository.Get(trade.Card_Id)!;
+            User trader = _userManager.GetUserById(trade.Created_By_Id) ?? throw new KeyNotFoundException("The user who created the trade was not found"); ;
+            Card? offeredCard = _userManager.GetCard(offeringUser, offeredCardId) ?? throw new KeyNotFoundException("Offered Card not found");
+            Card? tradeCard = _userManager.GetCard(trader, tradeCardId) ?? throw new KeyNotFoundException("Trade Card not found");
 
             if (trade.Required_Card_Type != offeredCard.CardType || offeredCard.Damage < trade.Min_Damage)
                 throw new ArgumentException("The offered card does not meet the trade requirements");
 
-            User createdTrade = _userManager.GetUserById(trade.Created_By_Id) ?? throw new KeyNotFoundException("The user who created the trade was not found"); ;
 
-            ProcessCardTransfer(tradingUser, offeredCard, tradeCard);
-            ProcessCardTransfer(createdTrade, tradeCard, offeredCard);
+            ProcessCardTransfer(offeringUser, offeredCard, tradeCard);
+            ProcessCardTransfer(trader, tradeCard, offeredCard);
+            _tradingRepository.Traded(trade.Id, TradeStatus.Traded);
         }
 
         private void ProcessCardTransfer(User user, Card removedCard, Card addedCard)
         {
+            _userManager.RemoveCardFromUser(user, removedCard);
             if (_userManager.HasCardInStack(user, removedCard.Id))
                 _userManager.AddCardToStack(user, addedCard);
             else if (_userManager.HasCardInDeck(user, removedCard.Id))
                 _userManager.AddCardToDeck(user, addedCard);
-            _userManager.RemoveCardFromUser(user, removedCard);
+        }
+
+        public void Delete(string cardId, User user)
+        {
+            Trade? trade = _tradingRepository.GetTradeFromCardId(cardId);
+            if (trade == null) throw new KeyNotFoundException("Trade not found");
+            if (trade.Created_By_Id != user.Id) throw new UnauthorizedAccessException("Unauthorized");
+            int deleted = _tradingRepository.Delete(cardId, user.Id);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace MTCG.Models
 
         public void AddCard(Card card)
         {
-                Cards.Add(card);
+           Cards.Add(card);
         }
 
         public void Set(List<Card> cards)

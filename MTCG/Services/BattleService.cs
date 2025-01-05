@@ -1,4 +1,7 @@
-﻿using MTCG.Models;
+﻿using Microsoft.Extensions.Logging;
+using MTCG.Models;
+using System.Numerics;
+using System.Reflection;
 
 namespace MTCG.Services
 {
@@ -15,6 +18,8 @@ namespace MTCG.Services
         public const int LosingPoints = 3;
 
         public const int DeckSize = 4;
+
+        private readonly UserManager _userManager = new();
 
         enum Effectiveness
         {
@@ -60,18 +65,25 @@ namespace MTCG.Services
             }
 
             if (gameStatus == GameStatus.LeftPlayerLost)
+            {
+                _userManager.AddWinToUser(RightPlayer);
                 Console.WriteLine($"Left Player Lost - he has {LeftPlayer.CardsCount()} Cards left");
+            }
             if (gameStatus == GameStatus.RightPlayerLost)
+            {
+                _userManager.AddLossesToUser(LeftPlayer);
                 Console.WriteLine($"Right Player Lost - he has {RightPlayer.CardsCount()} Cards left");
+            }
             else
             {
-                Console.WriteLine($"{(RightPlayer.Statistic.Wins > LeftPlayer.Statistic.Wins ? "Right" : "Left")} WON");
+                _userManager.AddDrawToUser(LeftPlayer);
+                _userManager.AddDrawToUser(RightPlayer);
+                Console.WriteLine($"Draw...");
             }
             Console.WriteLine("Left Player Deck: " + LeftPlayer.Deck.Cards.Count);
             Console.WriteLine("Left Player Stack: " + LeftPlayer.Stack.Cards.Count);
             Console.WriteLine("Right Player Deck: " + RightPlayer.Deck.Cards.Count);
             Console.WriteLine("Right Player Stack: " + RightPlayer.Stack.Cards.Count);
-
 
         }
 
@@ -127,38 +139,33 @@ namespace MTCG.Services
         private void UpdateGame(int leftPlayerDamage, Card leftPlayerCard, int rightPlayerDamage, Card rightPlayerCard)
         {
             if (leftPlayerDamage > rightPlayerDamage)
-            {
-                LeftPlayer.AddWin(WinningPoints);
-                RightPlayer.AddLosses(LosingPoints);
-                LeftPlayer.Deck.AddCard(rightPlayerCard);
-                RemoveCardFromPlayer(RightPlayer, rightPlayerCard);
-            }
+                UpdateStats(LeftPlayer, RightPlayer, rightPlayerCard);
             else if (leftPlayerDamage < rightPlayerDamage)
-            {
-                RightPlayer.AddWin(WinningPoints);
-                LeftPlayer.AddLosses(LosingPoints);
-                RightPlayer.Deck.AddCard(leftPlayerCard);
-                RemoveCardFromPlayer(LeftPlayer, leftPlayerCard);
-            }
-            else
-            {
-                LeftPlayer.AddDraw();
-                RightPlayer.AddDraw();
-            }
+                UpdateStats(RightPlayer, LeftPlayer, leftPlayerCard);
         }
 
-        private static void RemoveCardFromPlayer(User player, Card card)
+        private void UpdateStats(User winner, User loser, Card card)
         {
-            player.Deck.removeCard(card);
-            Card? randomCard = player.Stack.popRandomCard();
+            _userManager.IncEloUser(winner, WinningPoints);
+            _userManager.DecEloUser(loser, LosingPoints);
+            _userManager.AddCardToStack(winner, card);
+            RemoveCardFromPlayer(loser, card);
+        }
+
+        private void RemoveCardFromPlayer(User player, Card card)
+        {
+            _userManager.RemoveCardFromDeck(player, card);
+            Card? randomCard = _userManager.PopRandomCardFromStack(player);
             if (randomCard != null)
-                player.Deck.AddCard(randomCard);
+                _userManager.AddCardToDeck(player, randomCard);
         }
 
         public GameStatus CheckGameOver()
         {
             if (LeftPlayer.NoCardsLeft()) return GameStatus.LeftPlayerLost;
             if (RightPlayer.NoCardsLeft()) return GameStatus.RightPlayerLost;
+            if (LeftPlayer.Elo > RightPlayer.Elo) return GameStatus.RightPlayerLost;
+            else if (RightPlayer.Elo > LeftPlayer.Elo) return GameStatus.LeftPlayerLost;
             return GameStatus.Playing;
         }
     }

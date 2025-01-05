@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace MTCG.Services.HTTP
 {
@@ -8,6 +9,7 @@ namespace MTCG.Services.HTTP
         private readonly TcpListener _server;
         public IPAddress IpAddress { get; }
         public static int Port { get; private set; }
+        private static readonly object _lock = new();
 
         public Server(IPAddress ipAddress, int port = 8000)
         {
@@ -28,17 +30,32 @@ namespace MTCG.Services.HTTP
             {
                 Console.WriteLine($"Server Error: {e.Message}");
             }
-            
         }
 
         private void IncomingConnections()
-        { 
+        {
             while (true)
             {
                 var client = _server.AcceptTcpClient();
+                Task.Run(() => HandleClient(client));
+            }
+        }
+
+        private void HandleClient(TcpClient client)
+        {
+            try
+            {
                 using var reader = new StreamReader(client.GetStream());
                 using var writer = new StreamWriter(client.GetStream()) { AutoFlush = true };
                 HandleConnection(reader, writer);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling client: {ex.Message}");
+            }
+            finally
+            {
+                client.Close();
             }
         }
 
@@ -60,7 +77,6 @@ namespace MTCG.Services.HTTP
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-
-        }
+            }
     }
 }

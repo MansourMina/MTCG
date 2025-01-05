@@ -35,6 +35,7 @@ namespace MTCG.Database.Repositories
             JOIN stacks s ON u.id = s.user_id
             JOIN decks d ON u.id = d.user_id
             JOIN statistics st ON u.id = st.user_id
+            WHERE role = 'user'
             """;
             using IDbCommand command = _dal.CreateCommand(commandText);
 
@@ -129,7 +130,6 @@ namespace MTCG.Database.Repositories
             DataLayer.AddParameterWithValue(command, "@username", DbType.String, username);
             DataLayer.AddParameterWithValue(command, "@role", DbType.String, user.Role);
             command.ExecuteNonQuery();
-
         }
 
 

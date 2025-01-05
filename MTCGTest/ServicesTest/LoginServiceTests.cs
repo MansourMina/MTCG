@@ -40,7 +40,6 @@ namespace MTCGTest.Services
             // Assert
             Assert.That(token, Is.Not.Null);
             Assert.That(verifiedToken, Is.True);   
-
         }
 
         [Test]

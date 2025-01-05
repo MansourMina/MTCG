@@ -14,7 +14,17 @@ POST http://localhost:8000/users HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"RoleTest", 
+    "Username":"Mina", 
+    "Password":"Test1",
+    "Role": "user"
+}
+
+### Register User
+POST http://localhost:8000/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "Username":"Filip", 
     "Password":"Test1",
     "Role": "user"
 }
@@ -24,7 +34,7 @@ POST http://localhost:8000/users HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"admin2", 
+    "Username":"admin", 
     "Password":"Admin123",
     "Role":"admin"
 }
@@ -34,7 +44,16 @@ POST http://localhost:8000/sessions HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"RoleTest",
+    "Username":"Mina",
+    "Password":"Test1"
+}
+
+### Login User
+POST http://localhost:8000/sessions HTTP/1.1
+Content-Type: application/json
+
+{
+    "Username":"Filip",
     "Password":"Test1"
 }
 
@@ -43,7 +62,7 @@ POST http://localhost:8000/sessions HTTP/1.1
 Content-Type: application/json
 
 {
-    "Username":"admin2",
+    "Username":"admin",
     "Password":"Admin123"
 }
 
@@ -63,7 +82,7 @@ Authorization: Bearer admin-bed3dc82-4ce0-45d3-893f-77ddde280395
 ### Create Package
 POST http://localhost:8000/packages HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer admin-8c3675e6-ce0f-481a-92a4-53641316ae0f
+Authorization: Bearer admin-d639cbda-ea4f-4ee1-9ec0-8a8d01081199
 
 [
   {
@@ -96,53 +115,51 @@ Authorization: Bearer admin-8c3675e6-ce0f-481a-92a4-53641316ae0f
 ### GET Packages
 GET http://localhost:8000/packages HTTP/1.1
 
-
 ### Acquire Package
 POST http://localhost:8000/transactions/packages
 Content-Type: application/json
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Mina-dd897028-cc43-4322-bad8-1508ea1dfe73
 
 ### Get User Stack Cards
 GET http://localhost:8000/cards HTTP/1.1
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Mina-dc40be17-3eab-4ec0-8679-c58f722bcb15
 
 ### Get User Deck Cards
 GET http://localhost:8000/deck HTTP/1.1
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Mina-dc40be17-3eab-4ec0-8679-c58f722bcb15
 
 ### GET User Deck Cards with different format
 GET http://localhost:8000/deck?format=plain HTTP/1.1
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Filip-8568aa67-5879-4589-a393-bdaa84d96aa0
 
 ### Configure Deck
 PUT http://localhost:8000/deck HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Filip-8568aa67-5879-4589-a393-bdaa84d96aa0
 
 [
     "845f0dc7-37d0-426e-994e-43fc3ac83c08", 
     "99f8f8dc-e25e-4a95-aa2c-782823f36e2a", 
     "e85e3976-7c86-4d06-9a80-641c2019a79f",
-    "1cb6ab86-bdb2-47e5-b6e4-68c5ab389334"
+    "dfdd758f-649c-40f9-ba3a-8657f4b3439f"
 ]
 
 ### Get User Stats
 GET http://localhost:8000/stats HTTP/1.1
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Mina-dc40be17-3eab-4ec0-8679-c58f722bcb15
 
-### Get User Scoreboard
+### Get Users Scoreboard
 GET http://localhost:8000/scoreboard HTTP/1.1
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
-
+Authorization: Bearer Mina-dc40be17-3eab-4ec0-8679-c58f722bcb15
 
 ### Get Trading Deals
 GET http://localhost:8000/tradings HTTP/1.1
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Mina-a913bb5a-00cf-4c46-835e-30dcecbbf04c
 
 ### Create Trade
 POST http://localhost:8000/tradings HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
+Authorization: Bearer Mina-dd897028-cc43-4322-bad8-1508ea1dfe73
 
 {
     "Card_Id": "99f8f8dc-e25e-4a95-aa2c-782823f36e2a", 
@@ -150,11 +167,26 @@ Authorization: Bearer RoleTest-a5ab0bf5-89fe-4ae1-80be-33feef7a55e2
     "Min_Damage": 10
 }
 
-### Trade Card
-POST http://localhost:8000/tradings/6cd85277-4590-49d4-b0cf-ba0a921faad0 HTTP/1.1
+### DELETE User
+DELETE http://localhost:8000/tradings/99f8f8dc-e25e-4a95-aa2c-782823f36e2a HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer RoleTest-8efff682-a449-4a15-9616-88686b346ef4
+Authorization: Bearer Filip-d895f003-bf79-4978-8783-588342a82a7a
 
-"4ec8b269-0dfa-4f97-809a-2c63fe2a0025"
+### Trade Card
+POST http://localhost:8000/tradings/99f8f8dc-e25e-4a95-aa2c-782823f36e2a HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer Filip-8568aa67-5879-4589-a393-bdaa84d96aa0
+
+"dfdd758f-649c-40f9-ba3a-8657f4b3439f"
+
+### Start Battle One
+POST http://localhost:8000/battles
+Content-Type: application/json
+Authorization: Bearer Mina-dc40be17-3eab-4ec0-8679-c58f722bcb15
+
+### Start Battle Two
+POST http://localhost:8000/battles
+Content-Type: application/json
+Authorization: Bearer Filip-a61a8d37-91a7-4f79-98b3-cbf4339ffc8f
 
 

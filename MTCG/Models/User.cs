@@ -24,7 +24,7 @@ namespace MTCG.Models
 
         public string Id { get; private set; }
 
-        public StatisticService Statistic { get; private set; } = new StatisticService();
+        public Statistic Statistic { get; private set; } = new Statistic();
 
         private readonly UserRepository _userRepository;
         private readonly StackRepository _stackRepository;
@@ -70,21 +70,14 @@ namespace MTCG.Models
         {
             Id = id;
         }
-        public void AddWin(int points)
+        public void IncElo(int points)
         {
             Elo += points;
-            Statistic.AddWin();
         }
 
-        public void AddLosses(int points)
+        public void DecElo(int points)
         {
             Elo = (Elo - points < 0) ? 0 : Elo - points;
-            Statistic.AddLosses();
-        }
-
-        public void AddDraw()
-        {
-            Statistic.AddDraw();
         }
 
         public bool NoCardsLeft()
@@ -132,5 +125,10 @@ namespace MTCG.Models
             Coins = Math.Max(0, Coins - coins ?? 0);
         }
    
+            
+        public void SetStatistic(Statistic statistic)
+        {
+            Statistic = statistic;
+        }
     }
 }

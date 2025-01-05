@@ -4,8 +4,6 @@ namespace MTCGTest.Models
 {
     public class UserTests
     {
-
-
         [SetUp]
         public void Setup()
         {
@@ -103,7 +101,7 @@ namespace MTCGTest.Models
             int pointsToAdd = 10;
 
             // Act
-            user.AddWin(pointsToAdd);
+            user.IncElo(pointsToAdd);
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(110));
@@ -122,7 +120,7 @@ namespace MTCGTest.Models
             int pointsToRemove = 5;
 
             // Act
-            user.AddLosses(pointsToRemove);
+            user.DecElo(pointsToRemove);
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(5));
@@ -141,7 +139,7 @@ namespace MTCGTest.Models
             int pointsToRemove = 10;
 
             // Act
-            user.AddLosses(pointsToRemove);
+            user.DecElo(pointsToRemove);
 
             // Assert
             Assert.That(user.Elo, Is.EqualTo(0));

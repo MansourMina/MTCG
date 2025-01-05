@@ -41,7 +41,7 @@ namespace MTCG.Database.Repositories
 
         public int Remove(string card_id, string deck_id)
         {
-            var commandText = """DELETE from decks_cards where card_id = @card_id AND deck_id = @deck_id""";
+            var commandText = """DELETE from deck_cards where card_id = @card_id AND deck_id = @deck_id""";
             using IDbCommand command = _dal.CreateCommand(commandText);
             DataLayer.AddParameterWithValue(command, "@card_id", DbType.String, card_id);
             DataLayer.AddParameterWithValue(command, "@deck_id", DbType.String, deck_id);
