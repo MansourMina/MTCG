@@ -10,6 +10,7 @@ namespace MTCGTest.Services
     {
         private ILoginService _mockedLoginService;
         private UserManager _registerService;
+        private SessionService _sessionService;
         private IUserRepository _mockedUserRepository;
 
         [SetUp]
@@ -17,7 +18,9 @@ namespace MTCGTest.Services
         {
             _mockedUserRepository = Substitute.For<IUserRepository>();
             _mockedLoginService = Substitute.For<ILoginService>();
-            _registerService = new RegisterService(_mockedLoginService, _mockedUserRepository);
+            _registerService = new UserManager(_mockedUserRepository);
+            _sessionService = new SessionService(_mockedUserRepository);
+
         }
 
         [Test]
@@ -30,12 +33,12 @@ namespace MTCGTest.Services
             bool expectedVerification = true;
 
             _mockedLoginService.Login(username, password).Returns(expectedToken);
-            _mockedLoginService.VerifyToken(expectedToken).Returns(expectedVerification);
+            _sessionService.VerifyToken(expectedToken).Returns(expectedVerification);
 
             // Act
-            _registerService.Register(username, password);
+            _registerService.Register(username, password, "user");
             string token = _mockedLoginService.Login(username, password);
-            bool verifiedToken = _mockedLoginService.VerifyToken(token);
+            bool verifiedToken = _sessionService.VerifyToken(token);
 
             // Assert
             Assert.That(token, Is.EqualTo(expectedToken));
@@ -51,7 +54,7 @@ namespace MTCGTest.Services
             _mockedUserRepository.GetByName(username).Returns(new User(username, password));
 
             // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => _registerService.Register(username, password));
+            var exception = Assert.Throws<InvalidOperationException>(() => _registerService.Register(username, password, "user"));
             Assert.That(exception.Message, Is.EqualTo("User already exists"));
         }
 
@@ -63,20 +66,8 @@ namespace MTCGTest.Services
             string password = "testPassword";
 
             // Act & Assert
-            var exception = Assert.Throws<ArgumentException>(() => _registerService.Register(username, password));
+            var exception = Assert.Throws<ArgumentException>(() => _registerService.Register(username, password, "user"));
             Assert.That(exception.Message, Is.EqualTo("Username or password cannot be empty."));
-        }
-
-        [Test]
-        public void RegisterService_ShouldInitializeLoginServiceAndUserRepository()
-        {
-            // Act
-            var registerService = new UserManager();
-
-            // Assert
-            Assert.That(registerService.GetLoginService(), Is.Not.Null);
-            Assert.That(registerService.GetUserRepository(), Is.Not.Null);
-
         }
 
     }

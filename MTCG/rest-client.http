@@ -6,8 +6,8 @@ GET http://localhost:8000/ HTTP/1.1
 GET http://localhost:8000/users HTTP/1.1
 
 ### GET User by Username
-GET http://localhost:8000/users/admin2 HTTP/1.1
-Authorization: Bearer admin2-51d3c791-4e2a-4d57-ac7f-a704f5249e5a
+GET http://localhost:8000/users/Mina HTTP/1.1
+Authorization: Bearer Mina-mtcgToken
 
 ### Register User
 POST http://localhost:8000/users HTTP/1.1
@@ -71,18 +71,18 @@ DELETE http://localhost:8000/users/admin HTTP/1.1
 Content-Type: application/json
 
 ### UPDATE User
-PUT http://localhost:8000/users/admin HTTP/1.1
+PUT http://localhost:10001/users/Kienboeck HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer admin-bed3dc82-4ce0-45d3-893f-77ddde280395
+Authorization: Bearer Kienboeck-mtcgToken
 
 {
-    "Coins": 5
+    "Username": "kienboec"
 }
 
 ### Create Package
 POST http://localhost:8000/packages HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer admin-d639cbda-ea4f-4ee1-9ec0-8a8d01081199
+Authorization: Bearer admin-mtcgToken
 
 [
   {
@@ -157,9 +157,9 @@ GET http://localhost:8000/tradings HTTP/1.1
 Authorization: Bearer Mina-a913bb5a-00cf-4c46-835e-30dcecbbf04c
 
 ### Create Trade
-POST http://localhost:8000/tradings HTTP/1.1
+POST http://localhost:10001/tradings HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer Mina-dd897028-cc43-4322-bad8-1508ea1dfe73
+Authorization: Bearer kienboec-mtcgToken
 
 {
     "Card_Id": "99f8f8dc-e25e-4a95-aa2c-782823f36e2a", 
@@ -180,13 +180,12 @@ Authorization: Bearer Filip-8568aa67-5879-4589-a393-bdaa84d96aa0
 "dfdd758f-649c-40f9-ba3a-8657f4b3439f"
 
 ### Start Battle One
-POST http://localhost:8000/battles
+POST http://localhost:10001/battles
 Content-Type: application/json
-Authorization: Bearer Mina-dc40be17-3eab-4ec0-8679-c58f722bcb15
+Authorization: Bearer kienboec-mtcgToken
 
 ### Start Battle Two
-POST http://localhost:8000/battles
+POST http://localhost:10001/battles
 Content-Type: application/json
-Authorization: Bearer Filip-a61a8d37-91a7-4f79-98b3-cbf4339ffc8f
-
+Authorization: Bearer altenhof-mtcgToken
 

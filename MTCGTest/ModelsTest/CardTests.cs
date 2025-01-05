@@ -12,8 +12,8 @@ namespace MTCGTest.ModelsTest
             ElementType expectedElementType = ElementType.Fire;
 
             // Act
-            var monsterCard = new MonsterCard("TestMonster", expectedDamage, expectedElementType);
-            var spellCard = new SpellCard("TestSpell", expectedDamage, expectedElementType);
+            var monsterCard = new MonsterCard("TestMonster", expectedDamage, expectedElementType, Guid.NewGuid().ToString());
+            var spellCard = new SpellCard("TestSpell", expectedDamage, expectedElementType, Guid.NewGuid().ToString());
 
             // Assert
             Assert.That(monsterCard.Damage, Is.EqualTo(expectedDamage));

@@ -17,15 +17,12 @@ namespace MTCGTest.Models
             // Arrange
             string name = "testUser";
             string password = "testPassword";
-            var stack = new Stack();
-
             // Act
-            var user = new User(name, password, stack);
+            var user = new User(name, password, Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
 
             // Assert
             Assert.That(user.Username, Is.EqualTo(name));
             Assert.That(user.Password, Is.EqualTo(password));
-            Assert.That(user.Stack, Is.EqualTo(stack));
         }
 
         [Test]
@@ -156,7 +153,7 @@ namespace MTCGTest.Models
             User user = new(username, password);
 
             // Act
-            user.AddDraw();
+            user.Statistic.AddDraw();
 
             // Assert
             Assert.That(user.Statistic.Draws, Is.EqualTo(1));
@@ -217,7 +214,7 @@ namespace MTCGTest.Models
             string username = "testUser";
             string password = "$2a$12$hashedpassword";
             User user = new(username, password);
-            user.AddCardToDeck(new MonsterCard("TestMonster", 100, ElementType.Normal));
+            user.AddCardToDeck(new MonsterCard("TestMonster", 100, ElementType.Normal, Guid.NewGuid().ToString()));
 
             // Act
             bool noCards = user.NoCardsLeft();

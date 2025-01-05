@@ -15,16 +15,25 @@ namespace MTCG.Services
 {
     public class SessionService
     {
-        private readonly SessionRepository? _sessionRepository;
-        public SessionService(SessionRepository sessionRepository)
+        private readonly ISessionRepository? _sessionRepository;
+        private readonly IUserRepository? _userRepository;
+
+        public SessionService(ISessionRepository sessionRepository)
         {
             _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
+        }
+
+        public SessionService(IUserRepository userRepository)
+        {
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
         public SessionService()
         {
             _sessionRepository = new SessionRepository();
+            _userRepository = new UserRepository();
         }
+
 
         public string CreateSession(string userId)
         {

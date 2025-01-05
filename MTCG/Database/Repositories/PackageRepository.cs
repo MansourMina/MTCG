@@ -103,8 +103,6 @@ namespace MTCG.Database.Repositories
 
         private string AddCard(Card card)
         {
-            Console.WriteLine(card.ElementType.ToString());
-            Console.WriteLine(card.CardType.ToString());
             var commandText = """
                 INSERT INTO cards(id, name, damage, element_type, card_type)
                 VALUES (@id, @name, @damage, @element_type, @card_type)

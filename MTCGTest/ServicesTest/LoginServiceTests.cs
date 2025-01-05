@@ -8,6 +8,7 @@ namespace MTCGTest.Services
     public class LoginServiceTests
     {
         private LoginService _loginService;
+        private SessionService _sessionService;
         //private SessionService _sessionService;
         private IUserRepository _mockedUserRepository;
 
@@ -21,6 +22,7 @@ namespace MTCGTest.Services
         {
             _mockedUserRepository = Substitute.For<IUserRepository>();
             _loginService = new LoginService(_mockedUserRepository);
+            _sessionService = new SessionService(_mockedUserRepository);
         }
 
         [Test]
@@ -35,7 +37,7 @@ namespace MTCGTest.Services
 
             // Act
             string token = _loginService.Login(username, password);
-            bool verifiedToken = _loginService.VerifyToken(token);
+            bool verifiedToken = _sessionService.VerifyToken(token);
 
             // Assert
             Assert.That(token, Is.Not.Null);
@@ -69,7 +71,7 @@ namespace MTCGTest.Services
 
             // Act
             string token = _loginService.Login(username, password);
-            var loggedUserToken = LoginService.GetSessionToken(user);
+            var loggedUserToken = _sessionService.GetSessionByUser(user.Id);
 
             // Assert
             Assert.That(token, Is.EqualTo(loggedUserToken));
@@ -86,7 +88,7 @@ namespace MTCGTest.Services
             _mockedUserRepository.GetByName(username).Returns(user);
 
             // Act
-            var loggedUserToken = LoginService.GetSessionToken(user);
+            var loggedUserToken = _sessionService.GetSessionByUser(user.Id);
 
             // Assert
             Assert.That(loggedUserToken, Is.Null);
@@ -105,8 +107,8 @@ namespace MTCGTest.Services
             // Act
             var token = _loginService.Login(username, password);
             _loginService.Logout(token);
-            bool verifiedToken = _loginService.VerifyToken(token);
-            var isLoggedIn = LoginService.GetSessionToken(user);
+            bool verifiedToken = _sessionService.VerifyToken(token);
+            var isLoggedIn = _sessionService.GetSessionByUser(user.Id);
 
             // Assert
             Assert.That(isLoggedIn, Is.Null);
@@ -127,8 +129,8 @@ namespace MTCGTest.Services
             string token1 = _loginService.Login("user1", "password1");
             string token2 = _loginService.Login("user2", "password2");
 
-            var sessionToken1 = LoginService.GetSessionToken(user1);
-            var sessionToken2 = LoginService.GetSessionToken(user2);
+            var sessionToken1 = _sessionService.GetSessionByUser(user1.Id);
+            var sessionToken2 = _sessionService.GetSessionByUser(user2.Id);
 
             // Assert
             Assert.That(sessionToken1, Is.EqualTo(token1));

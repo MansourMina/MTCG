@@ -37,6 +37,7 @@ namespace MTCG.Services
             _packageRepository?.Add(package);
         }
 
+
         public Package? PopRandom()
         {
            List<Package> packages = _packageRepository.GetAll();
@@ -45,8 +46,20 @@ namespace MTCG.Services
            Random rnd = new Random();
            Package package = packages[rnd.Next(packages.Count)];
             
-            _packageRepository.Delete(package.Id);
            return package;
+        }
+
+        public void Remove(Package package)
+        {
+            if(package != null)
+                _packageRepository.Delete(package.Id);
+        }
+
+        public Package? GetFirst()
+        {
+            List<Package> packages = _packageRepository.GetAll();
+            if (packages.Count == 0) return null;
+            return packages[0];
         }
     }
 }

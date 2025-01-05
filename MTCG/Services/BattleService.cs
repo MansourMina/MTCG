@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using MTCG.Models;
+using System.Data;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 
 namespace MTCG.Services
 {
@@ -20,6 +22,7 @@ namespace MTCG.Services
         public const int DeckSize = 4;
 
         private readonly UserManager _userManager = new();
+        public List<string> BattleLog { get; private set; } = new();
 
         enum Effectiveness
         {
@@ -35,12 +38,13 @@ namespace MTCG.Services
             Playing
         }
 
-        public void Start()
+        public List<string> Start()
         {
             Random rnd = new();
             GameStatus gameStatus = GameStatus.Playing;
             while (CurrentRound <= MaxRounds && gameStatus == GameStatus.Playing)
             {
+                BattleLog.Add($"----------Round {CurrentRound}----------");
                 PrintStatistics(CurrentRound);
                 
                 gameStatus = CheckGameOver();
@@ -51,6 +55,9 @@ namespace MTCG.Services
 
                 Card leftPlayerCard = leftPlayerCards[rnd.Next(leftPlayerCards.Count)];
                 Card rightPlayerCard = rightPlayerCards[rnd.Next(rightPlayerCards.Count)];
+
+                BattleLog.Add($"Left Player uses {leftPlayerCard.Name} with {leftPlayerCard.Damage} damage.");
+                BattleLog.Add($"Right Player uses {rightPlayerCard.Name} with {rightPlayerCard.Damage} damage.");
 
                 int leftPlayerDamage = leftPlayerCard.Damage;
                 int rightPlayerDamage = rightPlayerCard.Damage;
@@ -66,25 +73,30 @@ namespace MTCG.Services
 
             if (gameStatus == GameStatus.LeftPlayerLost)
             {
-                _userManager.AddWinToUser(RightPlayer);
-                Console.WriteLine($"Left Player Lost - he has {LeftPlayer.CardsCount()} Cards left");
+                UpdateStats(RightPlayer, LeftPlayer);
+                BattleLog.Add($"Left Player Lost - Remaining Cards: {LeftPlayer.CardsCount()}");
             }
             if (gameStatus == GameStatus.RightPlayerLost)
             {
-                _userManager.AddLossesToUser(LeftPlayer);
-                Console.WriteLine($"Right Player Lost - he has {RightPlayer.CardsCount()} Cards left");
+                UpdateStats(LeftPlayer, RightPlayer);
+                BattleLog.Add($"Right Player Lost - Remaining Cards: {RightPlayer.CardsCount()}");
+
+            }
+            else if(CurrentRound >= MaxRounds)
+            {
+                if(LeftPlayer.Elo < RightPlayer.Elo)
+                    UpdateStats(RightPlayer, LeftPlayer);
+                else if(RightPlayer.Elo < LeftPlayer.Elo)
+                    UpdateStats(LeftPlayer, RightPlayer);
             }
             else
             {
                 _userManager.AddDrawToUser(LeftPlayer);
                 _userManager.AddDrawToUser(RightPlayer);
-                Console.WriteLine($"Draw...");
+                BattleLog.Add("Draw...");
             }
-            Console.WriteLine("Left Player Deck: " + LeftPlayer.Deck.Cards.Count);
-            Console.WriteLine("Left Player Stack: " + LeftPlayer.Stack.Cards.Count);
-            Console.WriteLine("Right Player Deck: " + RightPlayer.Deck.Cards.Count);
-            Console.WriteLine("Right Player Stack: " + RightPlayer.Stack.Cards.Count);
 
+            return BattleLog;
         }
 
         private void PrintStatistics(int round)
@@ -139,17 +151,23 @@ namespace MTCG.Services
         private void UpdateGame(int leftPlayerDamage, Card leftPlayerCard, int rightPlayerDamage, Card rightPlayerCard)
         {
             if (leftPlayerDamage > rightPlayerDamage)
-                UpdateStats(LeftPlayer, RightPlayer, rightPlayerCard);
+                UpdateRound(LeftPlayer, RightPlayer, rightPlayerCard);
             else if (leftPlayerDamage < rightPlayerDamage)
-                UpdateStats(RightPlayer, LeftPlayer, leftPlayerCard);
+                UpdateRound(RightPlayer, LeftPlayer, leftPlayerCard);
         }
 
-        private void UpdateStats(User winner, User loser, Card card)
+        private void UpdateRound(User winner, User loser, Card card)
         {
             _userManager.IncEloUser(winner, WinningPoints);
             _userManager.DecEloUser(loser, LosingPoints);
             _userManager.AddCardToStack(winner, card);
             RemoveCardFromPlayer(loser, card);
+        }
+
+        private void UpdateStats(User winner, User loser)
+        {
+            _userManager.AddWinToUser(winner);
+            _userManager.AddLossesToUser(loser);
         }
 
         private void RemoveCardFromPlayer(User player, Card card)
@@ -164,8 +182,6 @@ namespace MTCG.Services
         {
             if (LeftPlayer.NoCardsLeft()) return GameStatus.LeftPlayerLost;
             if (RightPlayer.NoCardsLeft()) return GameStatus.RightPlayerLost;
-            if (LeftPlayer.Elo > RightPlayer.Elo) return GameStatus.RightPlayerLost;
-            else if (RightPlayer.Elo > LeftPlayer.Elo) return GameStatus.LeftPlayerLost;
             return GameStatus.Playing;
         }
     }

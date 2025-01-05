@@ -47,7 +47,7 @@ namespace MTCG.Database.Repositories
                     reader.GetString(0),
                     reader.GetString(1),
                     reader.GetString(2),
-                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetString(3),
                     reader.GetInt32(4),
                     Enum.Parse<TradeStatus>(reader.GetString(5))
                 );
@@ -72,7 +72,7 @@ namespace MTCG.Database.Repositories
                     reader.GetString(0),
                     reader.GetString(1),
                     reader.GetString(2),
-                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetString(3),
                     reader.GetInt32(4),
                     Enum.Parse<TradeStatus>(reader.GetString(5))
                 );
@@ -97,7 +97,7 @@ namespace MTCG.Database.Repositories
                     reader.GetString(0),
                     reader.GetString(1),
                     reader.GetString(2),
-                    Enum.Parse<CardType>(reader.GetString(3)),
+                    reader.GetString(3),
                     reader.GetInt32(4),
                     Enum.Parse<TradeStatus>(reader.GetString(5))
                 );

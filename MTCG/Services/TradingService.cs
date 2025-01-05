@@ -38,7 +38,7 @@ namespace MTCG.Services
         {
             
             if (!_userManager.HasCardInInventory(user, trade.Card_Id)) throw new KeyNotFoundException("Card not found in inventory");
-            _tradingRepository.Create(trade.Id, trade.Card_Id, trade.Status.ToString(), trade.Created_By_Id, trade.Required_Card_Type.ToString(), trade.Min_Damage);
+            _tradingRepository.Create(trade.Id, trade.Card_Id, trade.Status.ToString(), trade.Created_By_Id, trade.Required_Card_Type, trade.Min_Damage);
         }
 
         public void Trade(string tradeCardId, User offeringUser, string offeredCardId)
@@ -56,7 +56,7 @@ namespace MTCG.Services
             Card? offeredCard = _userManager.GetCard(offeringUser, offeredCardId) ?? throw new KeyNotFoundException("Offered Card not found");
             Card? tradeCard = _userManager.GetCard(trader, tradeCardId) ?? throw new KeyNotFoundException("Trade Card not found");
 
-            if (trade.Required_Card_Type != offeredCard.CardType || offeredCard.Damage < trade.Min_Damage)
+            if (trade.Required_Card_Type != offeredCard.CardType.ToString() || offeredCard.Damage < trade.Min_Damage)
                 throw new ArgumentException("The offered card does not meet the trade requirements");
 
 

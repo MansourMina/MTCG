@@ -9,7 +9,7 @@ namespace MTCG.Services
 {
     public class BattleQueueService
     {
-        private readonly Queue<User> _queue = new();
+        private Queue<User> _queue = new();
         private readonly object _lock = new();
 
         public bool TryEnqueue(User user)
@@ -39,6 +39,19 @@ namespace MTCG.Services
             lock (_lock)
             {
                 return _queue.Count > 1;
+            }
+        }
+
+        public bool RemoveUser(User user)
+        {
+            lock (_lock)
+            {
+                if (_queue.Contains(user))
+                {
+                    _queue = new Queue<User>(_queue.Where(u => u != user));
+                    return true;
+                }
+                return false;
             }
         }
     }

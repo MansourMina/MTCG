@@ -26,6 +26,11 @@ namespace MTCG.Services
             _sessionRepository = sessionRepository ?? throw new ArgumentNullException(nameof(sessionRepository));
         }
 
+        public UserManager(IUserRepository userRepository)
+        {
+            _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
+        }
+
         public UserManager()
         {
             _userRepository = new UserRepository();
@@ -159,7 +164,7 @@ namespace MTCG.Services
 
         public void AcquirePackage(User user, int costs, List<Card> cards)
         {
-            if (user.Coins < Package.Costs) throw new NotSupportedException("Not enough money");
+            if (user.Coins < costs) throw new NotSupportedException("Not enough money");
             user.DecCoins(costs);
             user.Stack.Set(cards);
             _userRepository.UpdateUserCreds(user.Username, user);
@@ -177,12 +182,14 @@ namespace MTCG.Services
 
         public bool HasCardInStack(User user, string cardId)
         {
-            return user.Stack.Cards.Any(card => card.Id == cardId);
+            List<Card> cards = _cardRepository.GetStackCards(user.Stack.Id);
+            return cards.Any(card => card.Id == cardId);
         }
 
         public bool HasCardInDeck(User user, string cardId)
         {
-            return user.Deck.Cards.Any(card => card.Id == cardId);
+            List<Card> cards = _cardRepository.GetDeckCards(user.Deck.Id);
+            return cards.Any(card => card.Id == cardId);
         }
 
         public Card? GetCard(User user, string cardId)
